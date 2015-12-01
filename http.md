@@ -273,8 +273,13 @@ When using AF, there two method for it.
 	af_method=Normal
 	af_method=Selection
 
-<a name="af"> </a>
-###AF
+<a name="streaming"> </a>
+###Streaming
+The server address is 10.98.32.1 and port is 9876. It's a TCP based server.<br>
+Fetch one frame:<br>
+1. send 0x01(1 byte) to server to request one frame.<br>
+2. recv data (4 byte payload len + following the frame data)<br>
+3. repeat the step1/step2 to get more frames.<br>
 
 <a name="mag"> </a>
 ### Magnify
