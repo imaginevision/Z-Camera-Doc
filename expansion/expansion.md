@@ -213,7 +213,9 @@ supported config
     CAMERA_CONFIG_NONE,
 
 ### shutter line
-It works like half pressed/full pressed on the shutter button. (pin5/pin6)
+It works like half pressed/full pressed on the shutter button. (pin5/pin6)<br>
+Pressed - Low level<br>
+Released - High level<br>
 	
 ### SBUS
 channel 4 - mode switching<br>
