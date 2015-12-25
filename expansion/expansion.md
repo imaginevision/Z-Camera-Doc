@@ -24,6 +24,7 @@ S01 GPIO TEST.pdf is an example for external board.
 ### UART command
 Please make sure the 1st byte in eeprom is 0x03.<br>
 Under this mode, the E1 work as a server while the external work as client.<br>
+baud rate is 115200, 8 bits data, 1 bit stop, none parity.
 
 Command format:
 
