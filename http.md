@@ -281,6 +281,9 @@ Fetch one frame:<br>
 2. recv data (4 byte payload len + following the frame data)<br>
 3. repeat the step1/step2 to get more frames.<br>
 
+Data format in payload:<br>
+Each payload of the data is H.264 encoded data. If the fps is 30, you can get 30 H.264 data in one second.
+
 <a name="mag"> </a>
 ### Magnify
 It's used for MF assistent. It's not avaiable for recording.
