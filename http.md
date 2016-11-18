@@ -1,6 +1,7 @@
 ### Content
 + [`/info`](#info)
 + [`session`](#session)
++ [`upgrade`](#upgrade)
 + [`shutdown`](#shutdown)
 + [`reboot`](#reboot)
 + [`datetime`](#datetime)
@@ -40,6 +41,12 @@ Response:
 		"sw":"0.0.1"			// fw version
 	}
 
+### Get camera photo number in photo timelapse mode
+/ctrl/timelapse_stat
+
+### Get camera temperature
+/ctrl/temperature
+
 <a name="session"> </a>
 ### Session
 /ctrl/session[?action=quit]
@@ -51,6 +58,16 @@ Response:
 	/ctrl/session withouw arg means heart beat.
 
 ** We suggest the App owns the session when it's in foreground**
+
+<a name="upgrade"> </a>
+### Upgrade
+/uploadfirmware</br>
+This interface will upload upgrade file to the camera using standard POST, the file will be placed into the root of SDCARD directory。
+
+/ctrl/upgrade?action={action}
+
+    action=ui_check， # Camera will check the file, and need user to confirm upgrade in LCD
+	action=run， # Camera will check file and do upgrade but not display in LCD
 
 <a name="shutdown"> </a>
 ### shutdown
@@ -109,8 +126,37 @@ Just like the file request in HTTP. Range operation is supported.
 /DCIM/100MEDIA/EYED0001.MOV?act=thm
 The format of thumbnail is BMP or JPEG, please check the MIME type in HTTP response.
 
+### Get ScreenNail
+/DCIM/100MEDIA/EYED0001.JPG?act=scr
+
+### Get the file create time
+/DCIM/100MEDIA/EYED0001.JPG?act=ct </br>
+Response
+
+	{
+		"code":0,
+		"desc":"",
+		"msg":1479463832  # file create time，it's Unix timestamp
+	}
+
+### Get file MD5 value
+/DCIM/100MEDIA/EYED0001.JPG?act=md5 </br>
+Response
+
+	{
+		"code":0,
+		"desc":"",
+		"msg":"e729f0091f62d7e6437b0dbb5088816"  # MD5 value
+	}
+
 <a name="mode"> </a>
 ### Mode operation
+
+Camera have three mode：
+
+- Record
+- Capture， // will have subpattern, e.g timelapse
+- Playback
 
 #### Query
 /ctrl/mode?action=query 
@@ -135,9 +181,9 @@ Response
 Response
 
     {
-        "code":0
+        "code":0    <---- 0 is OK, other is NG
         "desc":""
-        "msg":"pb"              <-- one of [pb, cap, rec, unknown]
+        "msg":""
     }
 
 
@@ -148,6 +194,7 @@ Response
 	action=cap # capture
 	action=single # force to single capture
 	action=remain # query the number of remaining capture number
+	action=cancel_burst # if camera in burst mode, this interface will stop burst action
 	
 Response
 
@@ -177,7 +224,7 @@ Response
 ### Setting
 #### Qeury
 /ctrl/get?k={key}</br>
-There are three types for setting: string, option, range
+There are three types for setting: string, option, range <br>
 String:
 
 	{
@@ -215,31 +262,78 @@ Range:
 
 Valid settings：
 
-	ssid
-	ap_key
-	movfmt
-	photosize
-	battery
-	ev
-	brightness
-	saturation
-	sharpness
-	contrast
-	meter_mode
-	flicker，[auto, 50Hz, 60Hz]
-	iso
-	wb
-	iris
-	af_mode
-	focus
-	caf
-	photo_q
-	photo_tl
-	burst
-	led
-	beep
-	af_area
-	drive_mode
+	ssid,  // string type，set Wi-Fi SSID
+	ap_key， // string type，set Wi-Fi passwd
+	movfmt,
+	photosize，
+	wb, // white balance
+	iso,
+    sharpness，
+	contrast，
+	saturation, 
+	brightness，// image brightness
+	meter_mode, 
+	flicker, [auto, 50Hz, 60Hz]
+	video_system, // NTSC, PAL
+	video_putput, // CVBS out put
+	ev, 
+	battery，
+	lcd, // turn on/off LCD
+	rotation, // camera stream rotation
+	mag_pos, // 
+	focus，// [AF，MF]
+	iris， // aperture
+	af_mode，// [Normal, Flexible Zone]
+	af_area，// query current af area
+	mf_drive, // 
+	photo_q，// Photo quality [basic, fine, s.fine]
+	led, // control camera LED
+	beep，// control camera beep
+	max_exp， // Max exposure time
+	shutter_angle,
+	mwb, // manual white balance
+	lens_zoom //
+	lens_focus_pos
+	lens_focus_spd
+	shutter_spd, // shutter speed
+    caf_range,  
+    caf_sens,   // continue sensitivity
+	burst_spd,  // burst speed
+	lut,  // [sRGB, Z-LOG]
+	last_file_name,  //
+	camera_rot, // 
+	multiple_mode, // [None, Master, slave]
+	dewarp,  // Distortion correction
+	vignette,  // Vignette correction
+	noise_reduction,  // Noise reduction
+	tint,
+	file_number， 
+	lcd_backlight, 
+	hdmi_fmt, // HDMI output resolution
+	oled， 
+	multiple_id, 
+	multiple_delay， 
+	shoot_mode， // Capture mode, exposure mode，P/A/S/M
+	ois_mode， // Lens OIS function
+	split_duration， //
+	multiple_to， // multiple timeout
+	liveview_audio， // liveview with audio
+	max_iso， 
+	dhcp， // enable camera enable dhcpc
+	Fn, // Fn key function
+	auto_off, 
+    auto_off_lcd, 
+	photo_tl_num,  // photo timelapse mode, max capture number
+    photo_tl_interval, 
+	caf, // continue AF
+	hdmi_osd, // turn on/off HDMI OSD
+	F2, // F2 key function
+	drive_mode, // [Single, Burst shooting, Time lapse, Self-timer]
+	grid_display，// display grid in LCD 
+	photo_self_interval, s
+	focus_area， // Af area
+	level_correction，
+	WIFI_MODE， //switch wifi mode in ap/sta
 	
 	We will update the list later.
 
@@ -273,18 +367,42 @@ When using AF, there two method for it.
 	af_method=Normal
 	af_method=Selection
 
-<a name="streaming"> </a>
-###Streaming
-The server address is 10.98.32.1 and port is 9876. It's a TCP based server.<br>
-Fetch one frame:<br>
-1. send 0x01(1 byte) to server to request one frame.<br>
-2. recv data (4 byte payload len + following the frame data)<br>
-3. repeat the step1/step2 to get more frames.<br>
+<a name="af"> </a>
+###AF
+Camera focus area can be changed by http interface </br>
+/ctrl/af?pos={index}
 
-Data format in payload:<br>
-Each payload of the data is H.264 encoded data. If the fps is 30, you can get 30 H.264 data in one second.
+	pos=index, index is 32 bits int, high 16 bits is for X, low 16 bits is for Y.
+	We mark the camera preview into X(Y) (X direction and Y direction) evenly by 16 in each line.
+	When you mark a certain point X(Y) as 1, you set the point as your focus area.
 
-<a name="mag"> </a>
+    In the 16 x 16 matrix, X(Y),  all of the points you set as focus area should be in a rectangle and should be continuous. 
+
+e.g.</br>
+pos = ((0x6<<16) | 0x003c represents that (1,2) on the X direction and (2,3,4,5) on the Y direction consist the focus area (2x4=8 points in total).
+	
+	 |－－－－|－－－－|－－－－|－－－－|
+	| o o o o o o o o o o o o o o o o |
+	| o o o o o o o o o o o o o o o o |
+ 	| o x x o o o o o o o o o o o o o |
+ 	| o x x o o o o o o o o o o o o o |
+ 	| o x x o o o o o o o o o o o o o |
+ 	| o x x o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	| o o o o o o o o o o o o o o o o |
+ 	-----------------------------------
+
+When you are trying to realize this function by cell phone, note the picture ratio is different under video mode and still mode.
+   Video is 16:9 and still is 4:3. The size of the area should be adjusted according to the ratio.
+
 ### Magnify
 It's used for MF assistent. It's not avaiable for recording.
 
@@ -303,7 +421,21 @@ It's used for MF assistent. It's not avaiable for recording.
 ### SDCARD
 /ctrl/card?action={format}
 
-	action=format, format card
+	action=format, format card, default format FAT32
 	action=present，if the card is present
-	
+	action=fat32,  format card to FAT32
+	action=exfat,  format card to exFAT
+
+<a name="streaming"> </a>
+###Streaming
+The server address is 10.98.32.1 and port is 9876. It's a TCP based server.<br>
+Fetch one frame:<br>
+1. send 0x01(1 byte) to server to request one frame.<br>
+2. recv data (4 byte payload len + following the frame data)<br>
+3. repeat the step1/step2 to get more frames.<br>
+
+Data format in payload:<br>
+Each payload of the data is H.264 encoded data. If the fps is 30, you can get 30 H.264 data in one second.
+
+<a name="mag"> </a>
 
