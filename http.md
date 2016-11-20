@@ -268,14 +268,14 @@ Valid settings：
 	photosize，
 	wb, // white balance
 	iso,
-    sharpness，
+	sharpness，
 	contrast，
 	saturation, 
 	brightness，// image brightness
 	meter_mode, 
 	flicker, [auto, 50Hz, 60Hz]
 	video_system, // NTSC, PAL
-	video_putput, // CVBS out put
+	video_output, // CVBS out put
 	ev, 
 	battery，
 	lcd, // turn on/off LCD
@@ -296,8 +296,8 @@ Valid settings：
 	lens_focus_pos
 	lens_focus_spd
 	shutter_spd, // shutter speed
-    caf_range,  
-    caf_sens,   // continue sensitivity
+	caf_range,  
+	caf_sens,   // continue sensitivity
 	burst_spd,  // burst speed
 	lut,  // [sRGB, Z-LOG]
 	last_file_name,  //
@@ -322,9 +322,9 @@ Valid settings：
 	dhcp， // enable camera enable dhcpc
 	Fn, // Fn key function
 	auto_off, 
-    auto_off_lcd, 
+	auto_off_lcd, 
 	photo_tl_num,  // photo timelapse mode, max capture number
-    photo_tl_interval, 
+	photo_tl_interval, 
 	caf, // continue AF
 	hdmi_osd, // turn on/off HDMI OSD
 	F2, // F2 key function
