@@ -1,4 +1,4 @@
-### Genaral
+### General
 E1 has an expansion port to extend the function. It contains the following port:
 
 - SPI
@@ -9,8 +9,10 @@ E1 has an expansion port to extend the function. It contains the following port:
 - VCC
 - GND
 
-The port is multiplexed. We need an EEPROM in the extendtion board to indentify how to configurate the pin.
-When the camera booting, it will read the first byte in external EEPROM(address 0xa3) to indentify the expansion role. Please note here, hot plug is not supported. Currently the following role is supported:
+The port is multiplexed. We need an EEPROM in the extension board to indentify how to configure the pin.
+When the camera is booting up it reads the first byte in external EEPROM(address 0xa3) to indentify the expansion role. 
+
+Please note here, hot plug is not supported. Currently we only support the following roles:
 
 - CVBS + shutter line (0x00 in first byte)
 - CVBS + SBUS (0x01 in first byte)
@@ -23,7 +25,8 @@ S01 GPIO TEST.pdf is an example for external board.
 
 ### UART command
 Please make sure the 1st byte in eeprom is 0x03.<br>
-Under this mode, the E1 work as a server while the external work as client.<br>
+In this mode, the E1 will work as a server while the external cameras work as clients
+
 baud rate is 115200, 8 bits data, 1 bit stop, none parity.
 
 Command format:
@@ -163,7 +166,7 @@ Command list:
     UART_SHUTDOWN,           // | cmd |                          0xea 0x02 0x01 0x25
                              // | ack | ok/ng |                  0xea 0x02 0x02 0xa5 0x00
 
-UART GET CONFIG is used for get the camera setting. For example, the ISO.
+UART GET CONFIG is used for getting the camera settings. For example, the ISO.
 There are three types of config in camera
 
 - choice, e.g. ISO, IRIS..
@@ -185,7 +188,7 @@ format:
 		| 0xea | 0x02 | len | 0x0f | 0x0f |
 		| 0xea | 0x02 | len | 0x8f | 0x00 | 0x02 | 45 (4 bytes, high|low) | 100 (4 bytes, hig|low) | 0 (4 bytes, high|low) | 1 (4bytes, high|low) |
 
-UART SET CONFIG is used for set the camera. For example, the ISO, IRIS and so on.
+UART SET CONFIG is used for setting the camera configuration. For example, the ISO, IRIS and so on.
 There are three types of config in camera
 
 - choice, e.g. ISO, IRIS..
@@ -219,7 +222,7 @@ format:
         | 0xea | 0x02 | 0x04 | 0x0e | 0x30 | 0x01 | 0x00 |
         | 0xea | 0x02 | 0x02 | 0x8e | 0x00 |
 
-supported config key
+supported configuration keys are
 
 	CAMERA_CONFIG_MOVIE_FORMAT = 0x0,
     CAMERA_CONFIG_PHOTO_SIZE,
