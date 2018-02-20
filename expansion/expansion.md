@@ -18,8 +18,13 @@ When the camera booting, it will read the first byte in external EEPROM(address 
 - CVBS + UART (0x03 in first byte)
 
 ### Hardware
-Please refer to the pin.jpg and USB-LG12-0245.pdf<br>
-S01 GPIO TEST.pdf is an example for external board. 
+Please refer to the example pin below 
+![https://github.com/imaginevision/Z-Camera-Doc/blob/master/expansion/pin.jpg](https://github.com/imaginevision/Z-Camera-Doc/blob/master/expansion/pin.jpg) 
+
+![usb](https://github.com/imaginevision/Z-Camera-Doc/blob/master/expansion/USB-LG12-0245.pdf)
+ example board
+ 
+![example board](https://github.com/imaginevision/Z-Camera-Doc/blob/master/expansion/S01%20GPIO%20TEST.pdf) 
 
 ### UART command
 Please make sure the 1st byte in eeprom is 0x03.<br>
