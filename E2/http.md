@@ -1,4 +1,4 @@
-﻿This document describes the HTTP command to control the Z CAM E2 (firmware 0.82).
+Based on Z CAM E2 (firmware 0.82).
 
 ## Basic
  ```HTTP
@@ -22,14 +22,14 @@ GET /info
 
 ```javascript
 {
-	"model": "...",   // model of camera
-	"number": "1",// how many deivce in camera
-	"sw": "0.82", // fw version
-	"hw": "1",// hw version
-	"mac": "4e:4:b8:2d:78:db", // mac address
-	"eth_ip": "192.168.9.81",  // ethernet ip address
-	"sn": "329A0010009"// camera serial number
-	//...
+    "model": "...",   // model of camera
+    "number": "1",// how many deivce in camera
+    "sw": "0.82", // fw version
+    "hw": "1",// hw version
+    "mac": "4e:4:b8:2d:78:db", // mac address
+    "eth_ip": "192.168.9.81",  // ethernet ip address
+    "sn": "329A0010009"// camera serial number
+    //...
 }
 ```
 ## Session
@@ -458,7 +458,7 @@ GET /ctrl/set?action=clear
 
 
 
-### Card manangement
+## Card manangement
 
 Check if the card is present.
 ```HTTP
@@ -482,7 +482,7 @@ GET /ctrl/card?action=query_free
 GET /ctrl/card?action=query_total
 ```
 
-### Manage the files in camera
+## Manage the files in camera
 The layout of the folder is based on DCF rule, but we change the naming rule.
 
 To get files from the camera, you need to list out the folders first.
@@ -516,27 +516,27 @@ GET /DCIM/100ZCAME
 }
 ```
 
-#### Download
+### Download
 ```HTTP
 GET /DCIM/110ZCAME/ZCAM0099_0000_201811121522.MOV
 ```
-#### Delete
+### Delete
 ```HTTP
 GET /DCIM/110ZCAME/ZCAM0099_0000_201811121522.MOV?act=rm
 ```
 
-#### Get thumbnail
+### Get thumbnail
 ```HTTP
 GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=thm
 ```
 The response is JPEG data
-#### Get screennail
+### Get screennail
 ```HTTP
 GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=scr
 ```
 Screennail is a larger JPEG than the thumbnail
 
-#### Get create time of the file.
+### Get create time of the file.
 ```HTTP
 GET/DCIM/110ZCAME/ZCAM0101_0000_201811121539.MOV?act=ct 
 ```
@@ -548,7 +548,7 @@ GET/DCIM/110ZCAME/ZCAM0101_0000_201811121539.MOV?act=ct
 }
 ```
 
-#### Get file information
+### Get file information
 You can get the duration and size of the video file.
 ```HTTP
 GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=info
@@ -565,5 +565,136 @@ GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=info
 	"dur": 107107 // video duration.
 }
 ```
+## Asyc notification
+We use the websocket as the notification channel, play around with the /www/html/controller.html to see how the websocket work.
+
+It's usefull to know the battery/card status.
+
+## Example
+For controlling the camera, we put a plain web page in /www/index.html to show how it work.
+
+### Sequence to start controlling the camera
+```HTTP
+GET /info
+GET /ctrl/session
+GET /datetime?date=YYYY-MM-DD&time=hh:mm:ss
+GET /ctrl/mode?action=query
+GET /ctrl/get?k=iso
+GET /ctrl/get?k=movfmt
+```
+
+Verify the session before any changes will help you to avoid multiple control client issue.
+
+*Take /www/html/controller.html as your reference*
+
+### Change the movie format
+Movie format in firmware means the resolution and fps in the record file. Just like other /ctrl/set settings, we need to get first then set it later.
+```HTTP
+GET /ctrl/get?k=movfmt
+```
+Parse the JSON to find out what movie formats are supported, then set it to camera.
+```HTTP
+GET /ctrl/set?movfmt=4KP30
+```
+
+The supported list of movie format depends on many items:
+- Video System (PAL/NTSC/CINEMA)
+- WDR mode
+
+*Take /www/html/controller.html as your reference*
+
+### Streaming 4KP30/1080P30/720P30
+Check two item first:
+1. make sure the movie format is 4KP30 and VFR is off.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+    If not, use /ctrl/set to force it to 4KP30, VFR off.
+2. the stream 1 is idle
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream1&action=query
+    ```
+
+3840x2160, 40Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=3840&height=2160&bitrate=40000000
+```
+
+1920x1080, 10Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=1920&height=1080&bitrate=10000000
+```
+
+1280x720, 2Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=1280&height=720&bitrate=2000000
+```
+
+### Change the bitrate on the fly
+We don't need to stop the stream, if we only change the bitrate
+```HTTP
+GET /ctrl/stream_setting?index=stream1&bitrate=2000000
+```
+
+### Stream the 4KP60
+Check two item first:
+1. make sure the movie format is 4KP60 and VFR is off.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+    If not, use /ctrl/set to force it to 4KP60, VFR off.
+2. the stream 0 is idle
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream0&action=query
+    ```
+With this firmware, stream out any fps higher than 30, we need to use the stream 0.
+In this case, we can not record the stream to the file.
+    ```HTTP
+    GET /ctrl/set?send_stream=Stream0
+    ```
+***We will update the firmware to remove this limitation***
+
+### Stream the 4KP120
+Check two item first:
+1. make sure the movie format is 4K and VFR is 120.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+    If not, use /ctrl/set to force it to 4KP, VFR 120.
+2. the stream 0 is idle
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream0&action=query
+    ```
+We need to use the stream 0 to send out the 120 fps stream. In this case, we can not record the stream to the file.
+    ```HTTP
+    GET /ctrl/set?send_stream=Stream0
+    ```
+
+### Set the split duration to a shorter value
+To avoid corrupted file, Z CAM E2 split the record file to many clips if it do a long duration recording.
+Some of the users would like to use a very short split duration.
+
+We consider the duration in playback domain.
+
+If VFR is Off, it will split to a new file every 5 seconds(wall clock).
+```HTTP
+GET /ctrl/stream_setting?index=stream0&split=5
+```
+
+If VFR is on and playback frame is VFR, it will split to a new file every 5 seconds(wall clock).
+```HTTP
+GET /ctrl/stream_setting?index=stream0&split=5
+```
+
+If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K30. It will split to a new file every 20 seconds(wall clock).
+```HTTP
+GET /ctrl/stream_setting?index=stream0&split=5
+```
+
+
+
 
 
