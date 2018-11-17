@@ -1,7 +1,6 @@
 ﻿This document describes the HTTP command to control the Z CAM E2 (firmware 0.82).
 
 ## Basic
-Most of the command are based on GET request and the response is JSON
  ```HTTP
  GET /url
  ```
@@ -14,8 +13,7 @@ Most of the command are based on GET request and the response is JSON
 }
 ```
 
-## Commands
-### Get basic information
+## Get basic information
 You can use this command as 'ping' to see if the camera is OK.
 
 ```HTTP
@@ -34,34 +32,37 @@ GET /info
 	//...
 }
 ```
-### Session
+## Session
 Only one client can control the camera at the same time.
 
 You can try to get the session in the following interface, status code 409 means that you are failed to get the session.
 ```HTTP
 GET /ctrl/session
 ```
+Most of the command under /ctrl/* requeir the ownership of session.
 
-Quit the current session. Once you leave your control application, you'd better to quit the session.
+Quit the session. 
+
+Once you leave your control application, you'd better to quit the session.
 ```HTTP
 GET /ctrl/session?action=quit 
 ```
 
-### Date/time
-It's recommand that sync the date/time every time you connect to the camera.
+## Date/time
+It's recommend that sync the date/time every time you connect to the camera.
 ```HTTP
 GET /datetime?date=YYYY-MM-DD&time=hh:mm:ss
 ```
-### System control
+## System control
 ```HTTP
 GET /ctrl/shutdown
 GET /ctrl/reboot
 ```
 
-### Working mode
-Basicly, the camera works in two major modes: video recording and playback.
+## Working mode
+Basically, the camera works in two major modes: video record and playback.
 
-#### Query the working mode
+### Query the working mode
 ```HTTP
 GET /ctrl/mode?action=query
 ```
@@ -91,7 +92,7 @@ GET /ctrl/mode?action=query
 *_ing means it's recording or playbacking video
 
 
-#### Change the working mode
+### Change the working mode
 Switch to video record mode
 ```HTTP
 GET /ctrl/mode?action=to_rec
@@ -101,7 +102,7 @@ Switch to playback mode
 GET /ctrl/mode?action=to_pb
 ```
 
-### Video record control
+## Video record control
 It will start video record/video timelapse record
 ```HTTP
 /ctrl/rec?action=start
@@ -117,7 +118,7 @@ Query the maximun recording time, in minutes.
 GET /ctrl/rec?action=remain
 ```
 
-### Network streaming
+## Network streaming
 
 In Z CAM E2, there are two streams could be used for streaming.
 
@@ -130,8 +131,9 @@ Stream 1
 By default, it's used by the network streaming. The resolution is limited by the stream 0, it can NOT be larger than the stream 0. By default, the fps is 25 or 30, the encoder is H.264. The maxinum resolution and fps is 4KP30.
 
 
-#### Alter the stream source
+### Alter the stream source
 
+Using the stream 1 as the network streaming source is recommend.
 If the stream 1 can NOT meet your requirement, you can use the stream 0 as the network stream source. 
 
 However, in this case, you can't record the stream to file.
@@ -139,13 +141,14 @@ However, in this case, you can't record the stream to file.
 Change the stream source of network streaming.
 ```HTTP
 GET /ctrl/set?send_stream=Stream0
+GET /ctrl/set?send_stream=Stream1
 ```
 
-#### Buildin stream service
+### Buildin stream service
 We have build some stream services inside the camera. You can use them in an easy way.
 
 - MJPEG over HTTP
-  Basically, it's for debug. As the compress efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
+  Basically, it's for debug. As the compression efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
     ```HTTP
     GET /mjpeg_stream
     ```
@@ -157,7 +160,7 @@ We have build some stream services inside the camera. You can use them in an eas
 
 - SSP (NDA is need, and you need to know how to decode and sync)
 
-#### Advance setting
+### Advance setting
 
 Change the setting
 ```HTTP
@@ -185,9 +188,7 @@ GET /ctrl/stream_setting?index=stream1&width=3840&height=2160
 
 ***You must stop the streaming before you change the size***
 
-Change the bitrate
-
-e.g. change to 10Mbps
+Change the bitrate. e.g. change to 10Mbps
 
 ```HTTP
 GET /ctrl/stream_setting?index=stream1&bitrate=10000000
@@ -198,8 +199,8 @@ Query the setting
 GET /ctrl/stream_setting?action=query
 ```
 
-### Camera settings
-You can control most the settings in the camera, just like what you see in the camera's GUI.
+## Camera settings
+You can control most of the settings in the camera, just like what you see in the camera's GUI.
 
 There are three data types of the camera settings.
 
@@ -219,7 +220,7 @@ You should get the data type and status of the setting before you change it.
 
 Each of the setting is bind to a key. 
 
-#### Get setting
+### Get setting
 Use the following interface to get setting.
 ```HTTP
 GET /ctrl/get?k=key
@@ -282,7 +283,7 @@ We use contrast for reference.
 }
 ```
 
-#### Set setting
+### Set setting
 To set setting, use the following interface.
 ```HTTP
 GET /ctrl/set?key=value
@@ -302,24 +303,24 @@ GET /ctrl/set?video_system=PAL
 GET /ctrl/set?contrast=95
 ```
 
-#### Clear setting
+### Clear setting
 Depends on different firmware implementaion, the camera would be reboot.
 ```HTTP
 GET /ctrl/set?action=clear
 ```
 
-#### Supported keys
+### Supported keys
 
-##### Video
+#### Video
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
 | movfmt            | choice  | 4KP30/4KP60/...                     |
 | record_file_format| choice  | MOV/MP4                             |
-| rec_proxy_file    | choice  | record proxy file                   |
-| video_encoder     | choice  | h264/h265                           |
+| rec_proxy_file    | choice  | Record the proxy file               |
+| video_encoder     | choice  | h264/h265/..                        |
 | split_duration    | choice  | video record split duration         |
 | bitrate_level     | choice  | low/medium/high                     |
-| compose_mode      | choice  | Noraml/WDR                          |
+| compose_mode      | choice  | Normal/WDR                          |
 | movvfr            | choice  | Variable Framerate                  |
 | rec_fps           | choice  | Playback Framerate                  |
 | video_tl_interval | range   | video timelapse interval            |
@@ -327,7 +328,7 @@ GET /ctrl/set?action=clear
 | rec_duration      | range   | query the recording duration, in second |
 | last_file_name    | string  | query the last record file name     |
 
-##### Focus & Zoom
+#### Focus & Zoom
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
 | focus             | choice  | AF/MF                               |
@@ -340,13 +341,13 @@ GET /ctrl/set?action=clear
 | lens_zoom_pos     | range   | lens zoom position                  |
 | lens_focus_pos    | range   | lens focus position                 |
 | lens_focus_spd    | range   | control the speed of mf_drive/lens_focus_pos |
-| caf               | choice  | Continious AF On/Off                |
-| caf_sens          | choice  | CAF sensitivity                     |
-| live_caf          | choice  | On/Off                              |
-| mf_mag            | choice  | Magnify the image when doing MF     |
-| restore_lens_pos  | choice  | Restore lens position after reboot  |
+| caf               | choice  | Continious AF On/Off                     |
+| caf_sens          | choice  | CAF sensitivity                          |
+| live_caf          | choice  | On/Off                                   |
+| mf_mag            | choice  | Magnify the preview if we tunning the MF |
+| restore_lens_pos  | choice  | Restore lens position after reboot       |
 
-##### Exposure
+#### Exposure
 | key                   | type    | description                         |
 | :---                  |:----    |:----                                |
 | meter_mode            | choice  | AE meter mode                       |
@@ -367,7 +368,7 @@ GET /ctrl/set?action=clear
 | live_ae_shutter       | choice  | live value of shutter time, readonly|
 | live_ae_shutter_angle | choice  | live value of shutter angle, readonly|
 
-##### White Balance
+#### White Balance
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
 | wb                | choice  | Auto/Manual                         |
@@ -375,7 +376,7 @@ GET /ctrl/set?action=clear
 | tint              | range   | manual white banlance tint          |
 | wb_priority       | choice  | Ambiance/White                      |
 
-##### Image
+#### Image
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
 | sharpness         | choice  | Strong/Normal/Weak                  |
@@ -417,7 +418,7 @@ GET /ctrl/set?action=clear
 | assitool_zera_th1     | range  | Zebra high value                 |
 | assitool_zera_th2     | range  | Zebra low value                  |
 
-##### Misc
+#### Misc
 | key               | type    |description                          |
 | :---              |:----    |:----                                |
 | ssid              | string  | Wi-Fi SSID                          |
@@ -428,11 +429,11 @@ GET /ctrl/set?action=clear
 | led               | choice  | LED on/off                          |
 | lcd_backlight     | range   | lcd backlignt level                 |
 | hdmi_fmt          | choice  | Auto/4KP60/4KP30/...                |
-| hdmi_osd          | choice  | hdmi show camera info or not        |
+| hdmi_osd          | choice  | HDMI On Screen Display              |
 | usb_device_role   | choice  | Host/Mass storage/Network           |
 | uart_role         | choice  | Pelco D/Controller                  |
-| auto_off          | choice  | camera auto off                     |
-| auto_off_lcd      | choice  | camera auto off                     |
+| auto_off          | choice  | Camera auto off                     |
+| auto_off_lcd      | choice  | LCD auto off                     |
 | sn                | string  | serial number of the camera         |
 
 ##### Multiple Camera
@@ -442,17 +443,18 @@ GET /ctrl/set?action=clear
 | multiple_id       | range   | multiple camera id                  |
 
 **Photo Settings are not supported in E2**
+
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
-| photosize         | choice  | photo size **Not support in E2**    |
-| photo_q           | choice  | photo quality **Not support in E2** |
-| burst             | choice  | **Not support in E2**               |
-| max_exp           | choice  | **Not support in E2**               |
+| photosize         | choice  | photo resolution                    |
+| photo_q           | choice  | JPEG/RAW                            |
+| burst             | choice  |                                     |
+| max_exp           | choice  | max exposure time                   |
 | shoot_mode        | choice  | AE exposuer mode:P/A/S/M            |
-| drive_mode        | choice  | set photo mode:single/burst/timelpase |
-| photo_tl_interval | range   | photo timelpase interval |
-| photo_tl_num      | range   | photo timelpase number |
-| photo_self_interval| range  | **Not support in E2** |
+| drive_mode        | choice  | single/burst/timelpase              |
+| photo_tl_interval | range   | photo timelpase interval            |
+| photo_tl_num      | range   | photo timelpase number              |
+| photo_self_interval| range  | interval for selfie                 |
 
 
 
@@ -463,7 +465,7 @@ Check if the card is present.
 GET /ctrl/card?action=present
 ```
 
-Format the storage card, the camera will determine the filesystem format.
+Format the storage card, the camera will determine the filesystem format base on card capacity.
 ```HTTP
 GET /ctrl/card?action=format
 ```
@@ -481,9 +483,9 @@ GET /ctrl/card?action=query_total
 ```
 
 ### Manage the files in camera
-The layout of the folder is base on DCF rule, but we change the naming rule.
+The layout of the folder is based on DCF rule, but we change the naming rule.
 
-To get file from the camera, you need to list out the folders first.
+To get files from the camera, you need to list out the folders first.
 
 ```HTTP
 GET /DCIM/
