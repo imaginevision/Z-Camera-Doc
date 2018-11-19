@@ -138,7 +138,7 @@ GET /ctrl/mode?action=to_pb
 ## Video record control
 It will start video record/video timelapse record
 ```HTTP
-/ctrl/rec?action=start
+GET /ctrl/rec?action=start
 ```
 
 It will stop video record/video timelapse record
@@ -192,7 +192,9 @@ We have build some stream services inside the camera. You can use them in an eas
     rtsp://ip/live_stream
     ```
 
-- SSP (NDA is need, and you need to know how to decode and sync)
+- SSP
+
+  We will provide a library to get data stream.
 
 ### Advance setting
 
@@ -497,6 +499,7 @@ GET /ctrl/af?action=update_roi&x=0&y=0&w=100&h=100
 The [x,y,w,h] is normalized value scaled on 1000. 
 
 For example, if the resolution is 3840x2160, then
+
 ROI.X = (0/1000) * 3840 = 0
 
 ROI.Y = (0/1000) * 2160 = 0
@@ -532,17 +535,17 @@ GET /ctrl/set?lens_focus_pos=x
 #### Wide/Tele zoom
 Zoom in
 ```HTTP
-GET /ctrl/set?lens_zoom=1
+GET /ctrl/set?lens_zoom=in
 ```
 
 Zoom out
 ```HTTP
-GET /ctrl/set?lens_zoom=2
+GET /ctrl/set?lens_zoom=out
 ```
 
 Stop zoom
 ```HTTP
-GET /ctrl/set?lens_zoom=0
+GET /ctrl/set?lens_zoom=stop
 ```
 
 #### Zoom to a posiiton
@@ -691,9 +694,11 @@ GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=info
 ```
 
 ## Asyc notification
-We use the websocket as the notification channel, play around with the /www/html/controller.html to see how the websocket work.
+We use the websocket as the notification channel, check the source code on /www/html/controller.html to see how it work.
 
-It's usefull to know the battery/card status.
+```
+ws://host:81
+```
 
 ## Examples
 For controlling the camera, we put a plain web page in /www/index.html to show how it work.
@@ -726,7 +731,25 @@ The supported list of movie format depends on many items:
 - Video System (PAL/NTSC/CINEMA)
 - WDR mode
 
+**You can NOT change the movfmt & movvfr if the stream 0 is working!!!**
+
 *Take /www/html/controller.html as your reference*
+
+### Change the bitrate on the fly
+We don't need to stop the stream, if we only change the bitrate
+```HTTP
+GET /ctrl/stream_setting?index=stream1&bitrate=2000000
+```
+
+### Recommend stream settings
+
+| Stream resolutin & fps    | File resolution & fps  | send_stream | Notes                                     |
+|:--                        | :--                    | :--         | :--                                       |
+| 4KP30 or smaller          | 4KP30                  | Stream1     | set movfmt=4KP30                          |
+| 4KP30 or smaller          | 4KP60                  | Stream1     | set movfmt=4KP60                          |
+| 4KP60                     | not supported          | Stream0     | fw <= 0.82, set movfmt=4KP60              |
+| 4KP60                     | 4KP60                  | Stream1     | fw > 0.82, set movfmt=4KP60               |
+| 4KP120                    | not supported          | Stream0     | fw > 0.82, set movfmt=4KP30, movfr=120    |
 
 ### Streaming 4KP30/1080P30/720P30
 Check two item first:
@@ -734,6 +757,8 @@ Check two item first:
     ```HTTP
     GET /ctrl/get?k=movfmt
     GET /ctrl/get?k=movvfr
+    GET /ctrl/set?movfmt=4KP30
+    GET /ctrl/set?k=movvfr=Off
     ```
     If not, use /ctrl/set to force it to 4KP30, VFR off.
 2. the stream 1 is idle
@@ -756,29 +781,25 @@ GET /ctrl/stream_setting?index=stream1&width=1920&height=1080&bitrate=10000000
 GET /ctrl/stream_setting?index=stream1&width=1280&height=720&bitrate=2000000
 ```
 
-### Change the bitrate on the fly
-We don't need to stop the stream, if we only change the bitrate
-```HTTP
-GET /ctrl/stream_setting?index=stream1&bitrate=2000000
-```
-
 ### Stream the 4KP60
 Check two item first:
 1. make sure the movie format is 4KP60 and VFR is off.
     ```HTTP
     GET /ctrl/get?k=movfmt
     GET /ctrl/get?k=movvfr
+    GET /ctrl/set?movfmt=4KP60
+    GET /ctrl/set?k=movvfr=Off
     ```
     If not, use /ctrl/set to force it to 4KP60, VFR off.
-2. the stream 0 is idle
+2. the stream 0 is idle (fw <= 0.82 )
     ```HTTP
     GET /ctrl/stream_setting?index=stream0&action=query
     ```
 With this firmware, stream out any fps higher than 30, we need to use the stream 0.
 In this case, we can not record the stream to the file.
-    ```HTTP
-    GET /ctrl/set?send_stream=Stream0
-    ```
+```HTTP
+GET /ctrl/set?send_stream=Stream0
+```
 ***We will update the firmware to remove this limitation***
 
 ### Stream the 4KP120
@@ -787,6 +808,8 @@ Check two item first:
     ```HTTP
     GET /ctrl/get?k=movfmt
     GET /ctrl/get?k=movvfr
+    GET /ctrl/set?movfmt=4KP30
+    GET /ctrl/set?k=movvfr=120
     ```
     If not, use /ctrl/set to force it to 4KP, VFR 120.
 2. the stream 0 is idle
@@ -794,9 +817,9 @@ Check two item first:
     GET /ctrl/stream_setting?index=stream0&action=query
     ```
 We need to use the stream 0 to send out the 120 fps stream. In this case, we can not record the stream to the file.
-    ```HTTP
-    GET /ctrl/set?send_stream=Stream0
-    ```
+```HTTP
+GET /ctrl/set?send_stream=Stream0
+```
 
 ### Set the split duration to a shorter value
 To avoid corrupted file, Z CAM E2 split the record file to many clips if it do a long duration recording.
