@@ -447,7 +447,7 @@ We have build some stream services inside the camera. You can use them in an eas
 
 - SSP
 
-  We will provide a library to get data stream.
+  See [libssp](https://github.com/imaginevision/libssp)
 
 ### Advance setting
 
