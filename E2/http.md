@@ -151,90 +151,6 @@ Query the maximun recording time, in minutes.
 GET /ctrl/rec?action=remain
 ```
 
-## Network streaming
-
-In Z CAM E2, there are two streams could be used for streaming.
-
-Stream 0
-
-By default, it's used as the file recording in stroage card. The resolution and fps is controlled by MovieFormat and VFR. The encoder is set by the VideoEncoder in GUI or by video_encoder in /ctrl/set interface.
-
-Stream 1
-
-By default, it's used by the network streaming. The resolution is limited by the stream 0, it can NOT be larger than the stream 0. By default, the fps is 25 or 30, the encoder is H.264. The maxinum resolution and fps is 4KP30.
-
-
-### Alter the stream source
-
-Using the stream 1 as the network streaming source is recommend.
-If the stream 1 can NOT meet your requirement, you can use the stream 0 as the network stream source. 
-
-However, in this case, you can't record the stream to file.
-
-Change the stream source of network streaming.
-```HTTP
-GET /ctrl/set?send_stream=Stream0
-GET /ctrl/set?send_stream=Stream1
-```
-
-### Buildin stream service
-We have build some stream services inside the camera. You can use them in an easy way.
-
-- MJPEG over HTTP
-
-  Basically, it's for debug. As the compression efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
-    ```HTTP
-    GET /mjpeg_stream
-    ```
-
-- RTSP
-    ```
-    rtsp://ip/live_stream
-    ```
-
-- SSP
-
-  We will provide a library to get data stream.
-
-### Advance setting
-
-Change the setting
-```HTTP
-GET /ctrl/stream_setting
-```
-| param             | description                       |
-| :---              |:----                              |
-| index             | stream0/stream1                   |
-| width             | video width                       |
-| height            | video height                      |
-| bitrate           | encode bitrate (bps)              |
-| split             | in seconds (less than 5 minutes)  |
-
-As metion above, by default, stream 1 is used by network streaming, you can change the setting of the stream.
-
-Change the resolution
-```HTTP
-GET /ctrl/stream_setting?index=stream1&width=1920&height=1080
-GET /ctrl/stream_setting?index=stream1&width=848&height=480
-GET /ctrl/stream_setting?index=stream1&width=3840&height=2160
-```
-***The width must be 32 pixel alignment***
-
-***You must take care of the aspect ratio***
-
-***You must stop the streaming before you change the size***
-
-Change the bitrate. e.g. change to 10Mbps
-
-```HTTP
-GET /ctrl/stream_setting?index=stream1&bitrate=10000000
-```
-
-Query the setting
-```HTTP
-GET /ctrl/stream_setting?action=query
-```
-
 ## Camera settings
 You can control most of the settings in the camera, just like what you see in the camera's GUI.
 
@@ -250,7 +166,7 @@ You should get the data type and status(readonly or not) of the setting before y
 
 Each of the setting is bind to a key. 
 
-### Get setting
+### Get
 Use the following interface to get setting.
 ```HTTP
 GET /ctrl/get?k=key
@@ -313,7 +229,7 @@ We use contrast for reference.
 }
 ```
 
-### Set setting
+### Set
 To set setting, use the following interface.
 ```HTTP
 GET /ctrl/set?key=value
@@ -333,7 +249,7 @@ GET /ctrl/set?video_system=PAL
 GET /ctrl/set?contrast=95
 ```
 
-### Clear setting
+### Clear
 Depends on different firmware implementaion, the camera would be reboot.
 ```HTTP
 GET /ctrl/set?action=clear
@@ -484,6 +400,180 @@ GET /ctrl/set?action=clear
 | photo_tl_interval | range   | photo timelpase interval            |
 | photo_tl_num      | range   | photo timelpase number              |
 | photo_self_interval| range  | interval for selfie                 |
+
+
+
+
+## Network streaming
+
+In Z CAM E2, there are two streams could be used for streaming.
+
+Stream 0
+
+By default, it's used as the file recording in stroage card. The resolution and fps is controlled by 'movfmt' and 'movvfr'. The encoder is set by 'video_encoder' in /ctrl/set interface.
+
+Stream 1
+
+By default, it's used by the network streaming. The resolution is limited by the stream 0, it can NOT be larger than the stream 0. By default, the fps is 25 or 30, the encoder is H.264. The maxinum resolution and fps is 4KP30.
+
+
+### Alter the stream source
+
+Using the stream 1 as the network streaming source is recommend.
+If the stream 1 can NOT meet your requirement, you can use the stream 0 as the network stream source. 
+
+However, in this case, you can't record the stream to file.
+
+Change the stream source of network streaming.
+```HTTP
+GET /ctrl/set?send_stream=Stream0
+GET /ctrl/set?send_stream=Stream1
+```
+
+### Buildin stream service
+We have build some stream services inside the camera. You can use them in an easy way.
+
+- MJPEG over HTTP
+
+  Basically, it's for debug. As the compression efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
+    ```HTTP
+    GET /mjpeg_stream
+    ```
+
+- RTSP
+    ```
+    rtsp://ip/live_stream
+    ```
+
+- SSP
+
+  We will provide a library to get data stream.
+
+### Advance setting
+
+Change the setting
+```HTTP
+GET /ctrl/stream_setting
+```
+| param             | description                       |
+| :---              |:----                              |
+| index             | stream0/stream1                   |
+| width             | video width                       |
+| height            | video height                      |
+| bitrate           | encode bitrate (bps)              |
+| split             | in seconds (less than 5 minutes)  |
+
+As metion above, by default, stream 1 is used by network streaming, you can change the setting of the stream.
+
+Change the resolution
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=1920&height=1080
+GET /ctrl/stream_setting?index=stream1&width=848&height=480
+GET /ctrl/stream_setting?index=stream1&width=3840&height=2160
+```
+***The width/height must be 2 pixel alignment***
+
+***You must take care of the aspect ratio***
+
+***You must stop the streaming before you change the size***
+
+Query the setting
+```HTTP
+GET /ctrl/stream_setting?action=query
+```
+
+### Change the bitrate on the fly
+We don't need to stop the stream, if we only change the bitrate
+```HTTP
+GET /ctrl/stream_setting?index=stream1&bitrate=2000000
+```
+
+### Recommend stream settings
+
+| Stream resolutin & fps    | File resolution & fps  | send_stream | Notes                                     |
+|:--                        | :--                    | :--         | :--                                       |
+| 4KP30 or smaller          | 4KP30                  | Stream1     | set movfmt=4KP30                          |
+| 4KP30 or smaller          | 4KP60                  | Stream1     | set movfmt=4KP60                          |
+| 4KP60                     | not supported          | Stream0     | fw <= 0.82, set movfmt=4KP60              |
+| 4KP60                     | 4KP60                  | Stream1     | fw > 0.82, set movfmt=4KP60               |
+| 4KP120                    | not supported          | Stream0     | fw > 0.82, set movfmt=4KP30, movfr=120    |
+
+### Streaming 4KP30/1080P30/720P30
+Check two item first:
+1. make sure the movie format is 4KP30 and VFR is off.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+    If not, use /ctrl/set to force it to 4KP30, VFR off.
+    ```HTTP
+    GET /ctrl/set?movfmt=4KP30
+    GET /ctrl/set?k=movvfr=Off
+    ```
+2. the stream 1 is idle
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream1&action=query
+    ```
+
+3840x2160, 40Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=3840&height=2160&bitrate=40000000
+```
+
+1920x1080, 10Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=1920&height=1080&bitrate=10000000
+```
+
+1280x720, 2Mbps
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=1280&height=720&bitrate=2000000
+```
+
+### Stream the 4KP60
+Check two item first:
+1. make sure the movie format is 4KP60 and VFR is off.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+    If not, use /ctrl/set to force it to 4KP60, VFR off.
+    ```HTTP
+    GET /ctrl/set?movfmt=4KP60
+    GET /ctrl/set?k=movvfr=Off
+    ```
+2. the stream 0 is idle (fw <= 0.82 )
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream0&action=query
+    ```
+With this firmware, stream out any fps higher than 30, we need to use the stream 0.
+In this case, we can not record the stream to the file.
+```HTTP
+GET /ctrl/set?send_stream=Stream0
+```
+***We will update the firmware to remove this limitation***
+
+### Stream the 4KP120
+Check two item first:
+1. make sure the movie format is 4K and VFR is 120.
+    ```HTTP
+    GET /ctrl/get?k=movfmt
+    GET /ctrl/get?k=movvfr
+    ```
+
+    If not, use /ctrl/set to force it to 4KP, VFR 120.
+    ```HTTP
+    GET /ctrl/set?movfmt=4KP30
+    GET /ctrl/set?k=movvfr=120
+    ```
+2. the stream 0 is idle
+    ```HTTP
+    GET /ctrl/stream_setting?index=stream0&action=query
+    ```
+We need to use the stream 0 to send out the 120 fps stream. In this case, we can not record the stream to the file.
+```HTTP
+GET /ctrl/set?send_stream=Stream0
+```
 
 ## Focus & Zoom control
 ### Auto Focus
@@ -734,92 +824,6 @@ The supported list of movie format depends on many items:
 **You can NOT change the movfmt & movvfr if the stream 0 is working!!!**
 
 *Take /www/html/controller.html as your reference*
-
-### Change the bitrate on the fly
-We don't need to stop the stream, if we only change the bitrate
-```HTTP
-GET /ctrl/stream_setting?index=stream1&bitrate=2000000
-```
-
-### Recommend stream settings
-
-| Stream resolutin & fps    | File resolution & fps  | send_stream | Notes                                     |
-|:--                        | :--                    | :--         | :--                                       |
-| 4KP30 or smaller          | 4KP30                  | Stream1     | set movfmt=4KP30                          |
-| 4KP30 or smaller          | 4KP60                  | Stream1     | set movfmt=4KP60                          |
-| 4KP60                     | not supported          | Stream0     | fw <= 0.82, set movfmt=4KP60              |
-| 4KP60                     | 4KP60                  | Stream1     | fw > 0.82, set movfmt=4KP60               |
-| 4KP120                    | not supported          | Stream0     | fw > 0.82, set movfmt=4KP30, movfr=120    |
-
-### Streaming 4KP30/1080P30/720P30
-Check two item first:
-1. make sure the movie format is 4KP30 and VFR is off.
-    ```HTTP
-    GET /ctrl/get?k=movfmt
-    GET /ctrl/get?k=movvfr
-    GET /ctrl/set?movfmt=4KP30
-    GET /ctrl/set?k=movvfr=Off
-    ```
-    If not, use /ctrl/set to force it to 4KP30, VFR off.
-2. the stream 1 is idle
-    ```HTTP
-    GET /ctrl/stream_setting?index=stream1&action=query
-    ```
-
-3840x2160, 40Mbps
-```HTTP
-GET /ctrl/stream_setting?index=stream1&width=3840&height=2160&bitrate=40000000
-```
-
-1920x1080, 10Mbps
-```HTTP
-GET /ctrl/stream_setting?index=stream1&width=1920&height=1080&bitrate=10000000
-```
-
-1280x720, 2Mbps
-```HTTP
-GET /ctrl/stream_setting?index=stream1&width=1280&height=720&bitrate=2000000
-```
-
-### Stream the 4KP60
-Check two item first:
-1. make sure the movie format is 4KP60 and VFR is off.
-    ```HTTP
-    GET /ctrl/get?k=movfmt
-    GET /ctrl/get?k=movvfr
-    GET /ctrl/set?movfmt=4KP60
-    GET /ctrl/set?k=movvfr=Off
-    ```
-    If not, use /ctrl/set to force it to 4KP60, VFR off.
-2. the stream 0 is idle (fw <= 0.82 )
-    ```HTTP
-    GET /ctrl/stream_setting?index=stream0&action=query
-    ```
-With this firmware, stream out any fps higher than 30, we need to use the stream 0.
-In this case, we can not record the stream to the file.
-```HTTP
-GET /ctrl/set?send_stream=Stream0
-```
-***We will update the firmware to remove this limitation***
-
-### Stream the 4KP120
-Check two item first:
-1. make sure the movie format is 4K and VFR is 120.
-    ```HTTP
-    GET /ctrl/get?k=movfmt
-    GET /ctrl/get?k=movvfr
-    GET /ctrl/set?movfmt=4KP30
-    GET /ctrl/set?k=movvfr=120
-    ```
-    If not, use /ctrl/set to force it to 4KP, VFR 120.
-2. the stream 0 is idle
-    ```HTTP
-    GET /ctrl/stream_setting?index=stream0&action=query
-    ```
-We need to use the stream 0 to send out the 120 fps stream. In this case, we can not record the stream to the file.
-```HTTP
-GET /ctrl/set?send_stream=Stream0
-```
 
 ### Set the split duration to a shorter value
 To avoid corrupted file, Z CAM E2 split the record file to many clips if it do a long duration recording.
