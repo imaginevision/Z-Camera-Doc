@@ -1,5 +1,37 @@
 Based on Z CAM E2 (firmware 0.82).
 
+[Basic of API](#Basic)
+
+[Get camera information](#Get-camera-information)
+
+[Session](#Session)
+
+[Set Data/Time](#Date/Time)
+
+[System control](#System-control)
+
+[Working mode](#Working-mode)
+
+[Video record control](#Video-record-control)
+
+[Network streaming](#Network-streaming)
+
+[Camera settings](#Camera-settings)
+
+[Focus & Zoom control](#Focus-&-Zoom-control)
+
+[Magnify the preview](#Magnify-the-preview)
+
+[Pan Tilt control](#Pan-Tilt-control)
+
+[Card management](#Card-management)
+
+[File management](#File-management)
+
+[Asyc notification](#Asyc-notification)
+
+[Examples](#Examples)
+
 ## Basic
  ```HTTP
  GET /url
@@ -13,7 +45,7 @@ Based on Z CAM E2 (firmware 0.82).
 }
 ```
 
-## Get basic information
+## Get camera information
 You can use this command as 'ping' to see if the camera is OK.
 
 ```HTTP
@@ -48,11 +80,12 @@ Once you leave your control application, you'd better to quit the session.
 GET /ctrl/session?action=quit 
 ```
 
-## Date/time
+## Date/Time
 It's recommend that sync the date/time every time you connect to the camera.
 ```HTTP
 GET /datetime?date=YYYY-MM-DD&time=hh:mm:ss
 ```
+
 ## System control
 ```HTTP
 GET /ctrl/shutdown
@@ -148,6 +181,7 @@ GET /ctrl/set?send_stream=Stream1
 We have build some stream services inside the camera. You can use them in an easy way.
 
 - MJPEG over HTTP
+
   Basically, it's for debug. As the compression efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
     ```HTTP
     GET /mjpeg_stream
@@ -204,19 +238,13 @@ You can control most of the settings in the camera, just like what you see in th
 
 There are three data types of the camera settings.
 
-- Choice
-    
-    It contains an option list, you can choose the item you need.
+| Type              | Description                                                   |
+| :---              |:----                                                          |
+| choice            | Use the item from the option list                             |
+| range             | Numberic value, from mininum value to maxinum value with step |
+| string            | Text value                                                    |
 
-- Range
-
-    It describes the mininum value, maxinum value, and the step of the setting.
-
-- String
-
-    It's a string. e.g. The name of your SSID.
-
-You should get the data type and status of the setting before you change it.
+You should get the data type and status(readonly or not) of the setting before you change it.
 
 Each of the setting is bind to a key. 
 
@@ -333,7 +361,6 @@ GET /ctrl/set?action=clear
 | :---              |:----    |:----                                |
 | focus             | choice  | AF/MF                               |
 | af_mode           | choice  | Flexiable Zone/Human Detection      |
-| mag_pos           | range   | magnify position                    |
 | mf_drive          | range   | move the focus plane far/near       |
 | lens_zoom         | choice  | lens zoom in/out                    |
 | ois_mode          | choice  | lens ois mode                       |
@@ -456,9 +483,106 @@ GET /ctrl/set?action=clear
 | photo_tl_num      | range   | photo timelpase number              |
 | photo_self_interval| range  | interval for selfie                 |
 
+## Focus & Zoom control
+### Auto Focus
+Triger Auto Focus
+```HTTP
+GET /ctrl/af
+```
+
+Update the ROI of AF
+```HTTP
+GET /ctrl/af?action=update_roi&x=0&y=0&w=100&h=100
+```
+The [x,y,w,h] is normalized value scaled on 1000. 
+
+For example, if the resolution is 3840x2160, then
+ROI.X = (0/1000) * 3840 = 0
+
+ROI.Y = (0/1000) * 2160 = 0
+
+ROI.W = (100/1000) * 3840 = 384
+
+ROI.H = (100/1000) *  = 216
+
+You can update the center of the ROI in a simpler way
+```HTTP
+GET /ctrl/af?action=update_roi_center&x=500&y=500
+```
+
+Query the ROI of AF
+```HTTP
+GET /ctrl/af?action=query
+```
+
+### Manual Focus
+When we set the focus method to manula focus. You can control the focus far/near.
+```HTTP
+GET /ctrl/set?mf_drive=1
+GET /ctrl/set?mf_drive=-1
+```
+
+You can set the focus plane to a value. You can do the preset with this API.
+```HTTP
+GET /ctrl/set?lens_focus_pos=x
+```
 
 
-## Card manangement
+### Zoom
+#### Wide/Tele zoom
+Zoom in
+```HTTP
+GET /ctrl/set?lens_zoom=1
+```
+
+Zoom out
+```HTTP
+GET /ctrl/set?lens_zoom=2
+```
+
+Stop zoom
+```HTTP
+GET /ctrl/set?lens_zoom=0
+```
+
+#### Zoom to a posiiton
+```HTTP
+GET /ctrl/set?lens_zoom_pos=0
+```
+The range of the zoom position is 0-31
+
+
+## Magnify the preview
+If the camera is not recording (stream 0 is not running). You can magnify the preview data.
+
+```HTTP
+GET /ctrl/mag?action=enable
+GET /ctrl/mag?action=disable
+GET /ctrl/mag?action=query
+```
+
+## Pan Tilt control
+If pan-tilt device is connect to the camera, the camera can control it via the Pelco-D protocal. We provide the HTTP command to control the pan-tilt.
+```HTTP
+GET /ctrl/pt?action=direction&speed=N
+```
+| action            | description                |
+| :---              |:----                       |
+| left              | pan left                   |
+| right             | pan right                  |
+| up                | tilt up                    |
+| down              | tilt             |
+| leftup            |   |
+| leftdown          |   |
+| rightup           |   |
+| rightdown         |   |
+| stop              | stop pan-tilt              |
+
+The range of speed is 0-0x3f, larger value means faster speed.
+
+**The UART role must be set to PelcoD to use this feature**
+
+## Card management
 
 Check if the card is present.
 ```HTTP
@@ -482,7 +606,7 @@ GET /ctrl/card?action=query_free
 GET /ctrl/card?action=query_total
 ```
 
-## Manage the files in camera
+## File management
 The layout of the folder is based on DCF rule, but we change the naming rule.
 
 To get files from the camera, you need to list out the folders first.
@@ -565,12 +689,13 @@ GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=info
 	"dur": 107107 // video duration.
 }
 ```
+
 ## Asyc notification
 We use the websocket as the notification channel, play around with the /www/html/controller.html to see how the websocket work.
 
 It's usefull to know the battery/card status.
 
-## Example
+## Examples
 For controlling the camera, we put a plain web page in /www/index.html to show how it work.
 
 ### Sequence to start controlling the camera
@@ -693,8 +818,4 @@ If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K
 ```HTTP
 GET /ctrl/stream_setting?index=stream0&split=5
 ```
-
-
-
-
 
