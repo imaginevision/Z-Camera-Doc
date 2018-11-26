@@ -18,7 +18,7 @@ Based on Z CAM E2 (firmware 0.82).
 
 [Camera settings](#Camera-settings)
 
-[Focus & Zoom control](#Focus-&-Zoom-control)
+[Focus & Zoom control](#Focus--Zoom-control)
 
 [Magnify the preview](#Magnify-the-preview)
 
@@ -626,8 +626,7 @@ GET /ctrl/set?lens_focus_pos=x
 
 *Note: To control the focus manually with HTTP, the lens must be in the AF mode.*
 
-HTTP
-```
+```HTTP
 GET /ctrl/set?focus=AF
 ```
 
