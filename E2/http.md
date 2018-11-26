@@ -612,14 +612,24 @@ GET /ctrl/af?action=query
 When we set the focus method to manula focus. You can control the focus far/near.
 ```HTTP
 GET /ctrl/set?mf_drive=1
+GET /ctrl/set?mf_drive=2
+GET /ctrl/set?mf_drive=3
+GET /ctrl/set?mf_drive=-3
+GET /ctrl/set?mf_drive=-2
 GET /ctrl/set?mf_drive=-1
 ```
 
-You can set the focus plane to a value. You can do the preset with this API.
+You can set the focus plane to a specific value.
 ```HTTP
 GET /ctrl/set?lens_focus_pos=x
 ```
 
+*Note: To control the focus manually with HTTP, the lens must be in the AF mode.*
+
+HTTP
+```
+GET /ctrl/set?focus=AF
+```
 
 ### Zoom
 #### Wide/Tele zoom
