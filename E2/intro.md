@@ -111,12 +111,14 @@ Based on a fully charged NP-F970.
 
 ## Control the camera
 ### HTTP based control
+see [HTTP Protocol](http.md)
 #### Ethernet
 The Ethernet work in these 3 modes:
 
 - Router, you can plug the E2 into your router, E2 get IP from your router.
 - Direct, the E2 work as DHCP server, it assign IP to the client. IP is 10.98.23.1
 - Static, use the cfg file in storage card(/MISC/cfg) to setup the static IP.
+
     eth.ipaddr=192.168.8.8
 
     eth.netmask=255.255.255.0
