@@ -26,7 +26,7 @@ WDR is on.
 | 3840x2160 | 30/60 | 30/60 |
 | 4096x2160 | 23.98 | NA |
 | 4096x2160 | 30/60 | 30/60 |
-| 3696x2772 | 30 | NA |
+| 3696x2772 | 30/23.98| NA |
 
 ### PAL
 
@@ -89,7 +89,7 @@ WDR is on.
 | 4K | 60 < FR | 230 | 200 | 160 |
 | 1080P | FR <=30 | 30 | 20 | 10 |
 | 1080P | 30 < FR <= 60 | 60 | 30 | 15 |
-| 1080P | 60 < FR | 200 | 100 | 60 |
+| 1080P | 60 < FR | 200 | 130 | 60 |
 
 ## HDMI Resolution
 | Capture FR | HDMI (Max.) |
@@ -120,7 +120,7 @@ see [HTTP Protocol](http.md)
 The Ethernet work in these 3 modes:
 
 - Router, you can plug the E2 into your router, E2 get IP from your router.
-- Direct, the E2 work as DHCP server, it assign IP to the client. IP is 10.98.23.1
+- Direct, the E2 work as DHCP server, it assign IP to the client. IP is 10.98.32.1
 - Static, use the cfg file in storage card(/MISC/cfg) to setup the static IP.
 
     eth.ipaddr=192.168.8.8
