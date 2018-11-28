@@ -137,6 +137,10 @@ Windows/Mac/Linux has buildin driver for RNDIS device. Once you install the driv
 #### WiFi
 The WiFi in E2 work as a Access Point, connect your computer/smart phone to E2 to get the IP and access the camera. IP is 10.98.33.1.
 
+#### Find out the IP of camera
+- If you can use the menu of the camera, you can find the IP in the 'Connect' menu.
+- If your computer is in the same network of E2, you can use [Multicast DNS](https://en.m.wikipedia.org/wiki/Multicast_DNS)(e.g. [Bonjour](https://en.m.wikipedia.org/wiki/Bonjour_(software)#Bonjour_Browser)) to find out the IP.
+
 ### LANC
 It's compatible with [SONY's LANC](http://www.boehmel.de/lanc.htm).
 
