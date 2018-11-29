@@ -14,6 +14,8 @@ Based on Z CAM E2 (firmware 0.82).
 
 [Video record control](#Video-record-control)
 
+[Network setting](#Network-setting)
+
 [Network streaming](#Network-streaming)
 
 [Camera settings](#Camera-settings)
@@ -401,8 +403,28 @@ GET /ctrl/set?action=clear
 | photo_tl_num      | range   | photo timelpase number              |
 | photo_self_interval| range  | interval for selfie                 |
 
+## Network setting
+E2's Ethernet supports three IP modes:
+- Router, work as DHCP client, get IP from your local router.
+```HTTP
+    GET /ctrl/network?action=set&mode=router
+```
 
+- Direct, work as DHCP server, assin IP to the connected computer. IP is 10.98.32.1.
+```HTTP
+    GET /ctrl/network?action=set&mode=direct
+```
 
+- Static
+```HTTP
+    GET /ctrl/network?action=set&mode=static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
+```
+
+Get infomation about the Ethernet.
+
+```HTTP
+GET /ctrl/network?action=info
+```
 
 ## Network streaming
 
