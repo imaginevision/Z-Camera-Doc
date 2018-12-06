@@ -32,6 +32,8 @@ Based on Z CAM E2 (firmware 0.82).
 
 [Asyc notification](#Asyc-notification)
 
+[Firmware upgrade](#Firmware-upgrade)
+
 [Examples](#Examples)
 
 ## Basic
@@ -406,19 +408,22 @@ GET /ctrl/set?action=clear
 ## Network setting
 E2's Ethernet supports three IP modes:
 - Router, work as DHCP client, get IP from your local router.
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=router
-```
+    ```
 
 - Direct, work as DHCP server, assin IP to the connected computer. IP is 10.98.32.1.
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=direct
-```
+    ```
 
 - Static
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
-```
+    ```
 
 Get infomation about the Ethernet.
 
@@ -819,6 +824,58 @@ We use the websocket as the notification channel, check the source code on /www/
 
 ```
 ws://host:81
+```
+
+## Firmware upgrade
+You can do a firmware upgrade via HTTP.
+
+1. Upload the firmware to camera.
+
+```javascript
+Upload.prototype.doUpload = function (args) {
+    var that = this;
+    var formData = new FormData();
+
+    // add assoc key values, this will be posts values
+    formData.append("file", this.file, this.getName());
+    // formData.append("upload_file", true);
+
+    $.ajax({
+        type: "POST",
+        url: "/uploadfirmware",
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', /*that.progressHandling*/function (event) {
+
+                }, false);
+            }
+            return myXhr;
+        },
+        success: function (data) {
+            // your callback here
+            args.done();
+        },
+        error: function (error) {
+            // handle error
+        },
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+    });
+};
+```
+2. check if the firmware is valid
+```HTTP
+GET /ctrl/upgrade?action=fw_check
+```
+
+3. do the upgrade.
+```HTTP
+GET /ctrl/upgrade?action=run
 ```
 
 ## Examples
