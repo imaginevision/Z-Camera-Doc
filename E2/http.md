@@ -535,7 +535,7 @@ Check two item first:
     If not, use /ctrl/set to force it to 4KP30, VFR off.
     ```HTTP
     GET /ctrl/set?movfmt=4KP30
-    GET /ctrl/set?k=movvfr=Off
+    GET /ctrl/set?movvfr=Off
     ```
 2. the stream 1 is idle
     ```HTTP
