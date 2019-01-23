@@ -1,4 +1,4 @@
-Based on Z CAM E2 (firmware 0.82).
+Based on Z CAM E2 (firmware 0.83 or above).
 
 [Basic of API](#Basic)
 
@@ -489,6 +489,9 @@ GET /ctrl/stream_setting
 | height            | video height                      |
 | bitrate           | encode bitrate (bps)              |
 | split             | in seconds (less than 5 minutes)  |
+| fps               | fps of the stream data            |
+| venc              | video encoder                     |
+| bitwidth          | bit width of the H.265            |
 
 As metion above, by default, stream 1 is used by network streaming, you can change the setting of the stream.
 
@@ -503,6 +506,17 @@ GET /ctrl/stream_setting?index=stream1&width=3840&height=2160
 ***You must take care of the aspect ratio***
 
 ***You must stop the streaming before you change the size***
+
+Change the encoder
+```HTTP
+GET /ctrl/stream_setting?index=stream1&venc=h265
+```
+
+Change the bit width of H.265
+```HTTP
+GET /ctrl/stream_setting?index=stream1&bitwidth=10
+GET /ctrl/stream_setting?index=stream1&bitwidth=8
+```
 
 Query the setting
 ```HTTP
@@ -573,12 +587,19 @@ Check two item first:
     ```HTTP
     GET /ctrl/stream_setting?index=stream0&action=query
     ```
-With this firmware, stream out any fps higher than 30, we need to use the stream 0.
+Firmware older than 0.82(included), stream out any fps higher than 30, we need to use the stream 0.
 In this case, we can not record the stream to the file.
 ```HTTP
 GET /ctrl/set?send_stream=Stream0
 ```
-***We will update the firmware to remove this limitation***
+
+Firmware newer than 0.83(included), E2 support recording the 4KP60 file and stream out 4K60 at the same time.
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=3840&height=2160&bitrate=30000000
+GET /ctrl/stream_setting?index=stream1&fps=60
+```
+
+Both of the above command is supported with 0.83 or later firmware, our suggestion is to use the method 1.
 
 ### Stream the 4KP120
 Check two item first:
