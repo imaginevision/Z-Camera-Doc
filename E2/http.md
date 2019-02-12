@@ -1,4 +1,4 @@
-Based on Z CAM E2 (firmware 0.82).
+Based on Z CAM E2 (firmware 0.83 or above).
 
 [Basic of API](#Basic)
 
@@ -31,6 +31,8 @@ Based on Z CAM E2 (firmware 0.82).
 [File management](#File-management)
 
 [Asyc notification](#Asyc-notification)
+
+[Firmware upgrade](#Firmware-upgrade)
 
 [Examples](#Examples)
 
@@ -406,19 +408,22 @@ GET /ctrl/set?action=clear
 ## Network setting
 E2's Ethernet supports three IP modes:
 - Router, work as DHCP client, get IP from your local router.
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=router
-```
+    ```
 
 - Direct, work as DHCP server, assin IP to the connected computer. IP is 10.98.32.1.
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=direct
-```
+    ```
 
 - Static
-```HTTP
+
+    ```HTTP
     GET /ctrl/network?action=set&mode=static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
-```
+    ```
 
 Get infomation about the Ethernet.
 
@@ -484,6 +489,9 @@ GET /ctrl/stream_setting
 | height            | video height                      |
 | bitrate           | encode bitrate (bps)              |
 | split             | in seconds (less than 5 minutes)  |
+| fps               | fps of the stream data            |
+| venc              | video encoder                     |
+| bitwidth          | bit width of the H.265            |
 
 As metion above, by default, stream 1 is used by network streaming, you can change the setting of the stream.
 
@@ -498,6 +506,17 @@ GET /ctrl/stream_setting?index=stream1&width=3840&height=2160
 ***You must take care of the aspect ratio***
 
 ***You must stop the streaming before you change the size***
+
+Change the encoder
+```HTTP
+GET /ctrl/stream_setting?index=stream1&venc=h265
+```
+
+Change the bit width of H.265
+```HTTP
+GET /ctrl/stream_setting?index=stream1&bitwidth=10
+GET /ctrl/stream_setting?index=stream1&bitwidth=8
+```
 
 Query the setting
 ```HTTP
@@ -530,7 +549,7 @@ Check two item first:
     If not, use /ctrl/set to force it to 4KP30, VFR off.
     ```HTTP
     GET /ctrl/set?movfmt=4KP30
-    GET /ctrl/set?k=movvfr=Off
+    GET /ctrl/set?movvfr=Off
     ```
 2. the stream 1 is idle
     ```HTTP
@@ -568,12 +587,19 @@ Check two item first:
     ```HTTP
     GET /ctrl/stream_setting?index=stream0&action=query
     ```
-With this firmware, stream out any fps higher than 30, we need to use the stream 0.
+Firmware older than 0.82(included), stream out any fps higher than 30, we need to use the stream 0.
 In this case, we can not record the stream to the file.
 ```HTTP
 GET /ctrl/set?send_stream=Stream0
 ```
-***We will update the firmware to remove this limitation***
+
+Firmware newer than 0.83(included), E2 support recording the 4KP60 file and stream out 4K60 at the same time.
+```HTTP
+GET /ctrl/stream_setting?index=stream1&width=3840&height=2160&bitrate=30000000
+GET /ctrl/stream_setting?index=stream1&fps=60
+```
+
+Both of the above command is supported with 0.83 or later firmware, our suggestion is to use the method 1.
 
 ### Stream the 4KP120
 Check two item first:
@@ -819,6 +845,58 @@ We use the websocket as the notification channel, check the source code on /www/
 
 ```
 ws://host:81
+```
+
+## Firmware upgrade
+You can do a firmware upgrade via HTTP.
+
+1. Upload the firmware to camera.
+
+```javascript
+Upload.prototype.doUpload = function (args) {
+    var that = this;
+    var formData = new FormData();
+
+    // add assoc key values, this will be posts values
+    formData.append("file", this.file, this.getName());
+    // formData.append("upload_file", true);
+
+    $.ajax({
+        type: "POST",
+        url: "/uploadfirmware",
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', /*that.progressHandling*/function (event) {
+
+                }, false);
+            }
+            return myXhr;
+        },
+        success: function (data) {
+            // your callback here
+            args.done();
+        },
+        error: function (error) {
+            // handle error
+        },
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+    });
+};
+```
+2. check if the firmware is valid
+```HTTP
+GET /ctrl/upgrade?action=fw_check
+```
+
+3. do the upgrade.
+```HTTP
+GET /ctrl/upgrade?action=run
 ```
 
 ## Examples
