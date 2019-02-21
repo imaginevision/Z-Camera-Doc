@@ -264,7 +264,9 @@ GET /ctrl/set?action=clear
 #### Video
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
-| movfmt            | choice  | 4KP30/4KP60/...                     |
+| ~~~movfmt         | choice  | 4KP30/4KP60/...~~~               |
+| resolution        | choice  | 4K/C4K/...                          |
+| project_fps       | choice  | 23.98/24/...                        |
 | record_file_format| choice  | MOV/MP4                             |
 | rec_proxy_file    | choice  | Record the proxy file               |
 | video_encoder     | choice  | h264/h265/..                        |
