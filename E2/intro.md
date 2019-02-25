@@ -26,21 +26,21 @@
 
 | Frame Rate | H.264 | H.265 | ProRes 422 |
 | :--- | :---: | :--: | :--:|
-| FR <= 30 | Y | Y (10bit) | Check next section |
-| 30 < FR <= 60 | N | Y (10bit) | Check next section |
-| 60 < FR <= 120 | N | Y (10bit) | Check next section |
-| 120 < FR | N | Y (8bit) | Check next section |
+| FR <= 30 | Y | Y (10bit 420) | Check next section |
+| 30 < FR <= 60 | N | Y (10bit 420) | Check next section |
+| 60 < FR <= 120 | N | Y (10bit 420) | Check next section |
+| 120 < FR | N | Y (8bit 420) | Check next section |
 
 *Chroma sample is 4:2:0 for H.264/H.265; 4:2:2 for ProRes*
 
 ## ProRes
 
-| Record Mode | 3840x2160 4K(Low Noise) | 4096x2160 C4K(Low Noise))| 1920x1080 16:9 HD | 3696x2772 4:3 Anamorphic | 3840x2160 16:9 4K/UHD | 4096x2160 17:9 C4K/DCI4K | 3312x2760 6:5  |
+| Record Mode | 3840x2160 4K(Low Noise) | 4096x2160 C4K(Low Noise))| 1920x1080 16:9 HD | 3696x2772 4:3 Anamorphic |  3312x2760 6:5  | 3840x2160 16:9 4K/UHD | 4096x2160 17:9 C4K/DCI4K |
 | :---        | :---:                   | :--:                     | :---:             | :--:                     | :--:                  | :--:                     | :--:           |
-| ProRes Proxy| fps <= 60               | fps <= 60                | fps <= 120        | fps <= 60                | fps <= 60             | fps <= 60                | fps <= 60      |
-| ProRes LT   | fps <= 60               | fps <= 60                | fps <= 120        | fps <= 60                | fps <= 60             | fps <= 60                | fps <= 60      |
-| ProRes 422  | fps <= 60               | fps <= 48                | fps <= 120        | fps <= 48                | fps <= 60             | fps <= 48                | fps <= 48      |
-| ProRes HQ   | fps <= 30               | fps <= 30                | fps <= 100        | fps <= 30                | fps <= 30             | fps <= 30                | fps <= 30      |
+| ProRes 422 Proxy| fps <= 30               | fps <= 30                | fps <= 120        | fps <= 60                | fps <= 60      | fps <= 60             | fps <= 60                |
+| ProRes 422 LT   | fps <= 30               | fps <= 30                | fps <= 120        | fps <= 60                | fps <= 60      | fps <= 60             | fps <= 60                |
+| ProRes 422  | fps <= 30               | fps <= 30                | fps <= 120        | fps <= 48                | fps <= 48      | fps <= 60             | fps <= 48                |
+| ProRes 422 HQ   | fps <= 30               | fps <= 30                | fps <= 100        | fps <= 30            |   fps <= 30      | fps <= 30             | fps <= 30                |
 
 *fps >= 100, the maxinum output of HDMI is 1080p60*
 
