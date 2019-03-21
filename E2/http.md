@@ -412,22 +412,28 @@ E2's Ethernet supports three IP modes:
 - Router, work as DHCP client, get IP from your local router.
 
     ```HTTP
-    GET /ctrl/network?action=set&mode=router
+    GET /ctrl/network?action=set&mode=Router
     ```
 
 - Direct, work as DHCP server, assin IP to the connected computer. IP is 10.98.32.1.
 
     ```HTTP
-    GET /ctrl/network?action=set&mode=direct
+    GET /ctrl/network?action=set&mode=Direct
     ```
 
 - Static
 
     ```HTTP
-    GET /ctrl/network?action=set&mode=static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
+    GET /ctrl/network?action=set&mode=Static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
     ```
 
-Get infomation about the Ethernet.
+Get infomation about the currently-selected IP mode:
+
+```HTTP
+GET /ctrl/network?action=query
+```
+
+Get infomation about the Ethernet and TCP/IP configuration
 
 ```HTTP
 GET /ctrl/network?action=info
