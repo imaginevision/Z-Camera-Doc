@@ -961,7 +961,7 @@ If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K
 GET /ctrl/stream_setting?index=stream0&split=5
 ```
 
-### Manull black level and rgb gain
+### Manual black level and rgb gain
 
 #### Manual black level adjustment
 Get status
