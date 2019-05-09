@@ -264,8 +264,8 @@ GET /ctrl/set?action=clear
 #### Video
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
-| ~~~movfmt         | choice  | 4KP30/4KP60/...~~~               |
-| resolution        | choice  | 4K/C4K/...                          |
+| ~~movfmt         | choice  | 4KP30/4KP60/...~~               |
+| ~~resolution        | choice  | 4K/C4K/...~~                          |
 | project_fps       | choice  | 23.98/24/...                        |
 | record_file_format| choice  | MOV/MP4                             |
 | rec_proxy_file    | choice  | Record the proxy file               |
@@ -326,6 +326,9 @@ GET /ctrl/set?action=clear
 | mwb               | range   | manual white banlance kelvin        |
 | tint              | range   | manual white banlance tint          |
 | wb_priority       | choice  | Ambiance/White                      |
+| mwb_r             | range   | manual white banlance r gain        |
+| mwb_g             | range   | manual white banlance g gain        |
+| mwb_b             | range   | manual white banlance b gain        |
 
 #### Image
 | key               | type    | description                         |
@@ -384,8 +387,9 @@ GET /ctrl/set?action=clear
 | usb_device_role   | choice  | Host/Mass storage/Network           |
 | uart_role         | choice  | Pelco D/Controller                  |
 | auto_off          | choice  | Camera auto off                     |
-| auto_off_lcd      | choice  | LCD auto off                     |
+| auto_off_lcd      | choice  | LCD auto off                        |
 | sn                | string  | serial number of the camera         |
+| desqueeze         | choice  | desqueeze display:1x/1.33x/1.5x/2x  |
 
 ##### Multiple Camera
 | key               | type    |description                          |
@@ -957,3 +961,64 @@ If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K
 GET /ctrl/stream_setting?index=stream0&split=5
 ```
 
+### Manull black level and rgb gain
+
+#### Manual black level adjustment
+Get status
+```HTTP
+GET /ctrl/manual_blc?action=get
+```
+
+```javascript
+{
+    "code":0,
+    "desc":"",
+    "msg":"",
+    "enable":0,
+    "r" :256,
+    "gr":256,
+    "gb":256,
+    "b" :256
+}
+```
+
+Enable
+```HTTP
+GET /ctrl/manual_blc?action=set&enable=1&rggb=r_value,gr_value,gb_value,b_value
+```
+
+Disable
+```HTTP
+GET /ctrl/manual_blc?action=set&enable=0&rggb=0,0,0,0
+```
+
+#### Set manual R/G/B gain
+Set white balance mode to expert mode first.
+```HTTP
+GET /ctrl/set?wb=Expert
+```
+
+Take R channel as example, get manual R gain then set it later.
+```HTTP
+GET /ctrl/get?k=mwb_r
+```
+
+```javascript
+{
+    "code": 0,
+    "desc": "string",
+    "key": "mwb_r",
+    "type": 2,
+    "ro": 0,
+    "value": 2467,  // current value
+    "min": 1024,    // mininum value
+    "max": 4096,    // maxinum value
+    "step": 1
+}
+```
+
+```HTTP
+GET /ctrl/set?mwb_r=3000
+```
+
+For B channel, please use mwb_b.
