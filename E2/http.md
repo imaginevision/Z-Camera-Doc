@@ -92,8 +92,8 @@ GET /datetime?date=YYYY-MM-DD&time=hh:mm:ss
 
 ## NTP time
 ```HTTP
-GET /sntp?action=start&ip_addr=192.aa.bb.cc&port=123
-GET /sntp?action=stop
+GET /ctrl/sntp?action=start&ip_addr=192.aa.bb.cc&port=123
+GET /ctrl/sntp?action=stop
 ```
 
 ## System control
