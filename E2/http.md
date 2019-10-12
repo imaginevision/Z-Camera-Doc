@@ -360,6 +360,7 @@ GET /ctrl/set?action=clear
 | audio_input_gain      | range   | audio input gain                |
 | audio_output_gain     | range   | audio output gain               |
 | audio_phantom_power   | choice  | On/Off                          |
+| ain_gain_type         | choice  | AGC/MGC                         |
 
 #### Timecode
 | key               | type    | description                         |
