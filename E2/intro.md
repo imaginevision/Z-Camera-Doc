@@ -115,7 +115,7 @@ Based on a fully charged NP-F970.
 
 ## Control the camera
 ### HTTP based control
-see [HTTP Protocol](http.md)
+see [HTTP Protocol](protocol/http.md)
 #### Ethernet
 The Ethernet work in these 3 modes:
 
@@ -144,12 +144,14 @@ The WiFi in E2 work as a Access Point, connect your computer/smart phone to E2 t
 ### LANC
 It's compatible with [SONY's LANC](http://www.boehmel.de/lanc.htm).
 
+We add some extend commands to make it easier to control E2, see [extend command](protocol/lanc.md).
+
 ### Serial port
 In E2 series, we provide two types of serial port:
 - Virtual serial, USB CDC ACM
 - Real serial, TTL & RS232 level are supported in standard E2, TTL on E2 flagship.
 
-Check the [sample code](uart/example) for reference.
+Check the [sample code](protocol/uart/example) for reference.
 
 ## Overlay
 ### Exposure

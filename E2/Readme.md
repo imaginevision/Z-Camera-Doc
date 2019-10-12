@@ -1,9 +1,11 @@
 ## General resource
 - [Basic information](intro.md)
-- [HTTP Protocol](http.md)
-- [Serial Port Protocol](uart)
-- [LANC Protocol](lanc.md)
 - [STP file](design/e2_3d.zip)
+
+## Control protocol
+- [HTTP Protocol](protocol/http.md)
+- [Serial Port Protocol](protocol/uart)
+- [LANC Protocol](protocol/lanc.md)
 
 ## Camera spec
 - [E2](spec/E2_spec.md)
