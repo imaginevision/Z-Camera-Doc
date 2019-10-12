@@ -26,3 +26,12 @@
 | 3696x2772 4:3 Anamorphic | 48          |
 | 3312x2760 6:5            | 48          |
 | 1920x1080 16:9 HD        | 60          |
+
+## Native ISO
+
+| Mode  | value |
+| :---  | :---: |
+| Low   | 500   |
+| High  | 2500  |
+
+Maximum ISO without digital gain : 51200

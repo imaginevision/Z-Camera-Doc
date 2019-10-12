@@ -1,3 +1,4 @@
+## Resolution & Framerate
 
 | Resolution                   | Maximum fps         |
 | :---                         | :---:               |
@@ -13,3 +14,12 @@
 | 3840x2160 4K UHD(Low Noise)  | 30                  |
 | 3840x2160 4K UHD             | 75                  |
 | 1920x1080                    | 120                 |
+
+## Native ISO
+
+| Mode  | value |
+| :---  | :---: |
+| Low   | 400   |
+| High  | 1250  |
+
+Maximum ISO without digital gain : 64000

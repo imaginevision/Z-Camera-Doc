@@ -3,12 +3,27 @@
 There are 4 image profile:
 - Rec.709
 - Z-Log2
+- Z-Log2Cine, one more stop in high light than Z-Log2. (E2-F6 only)
 - Flat, same dymanic range as Z-Log2 but with color correction.
 - HLG
 
 *When using WDR, the image profile is fixed to Z-Log2*
 
 *When using HLG, the video encoder must support 10 bit encoding, which means it should be ProRes or H.265*
+
+## Dynamic Range
+Take E2 as example.
+
+![DR](dr.png)
+
+* Based on Z-Log2
+* '*' means native ISO
+* '**' means ISO with digital gain
+* WDR (Wide Dynamic Range) get extra stops in high light
+* Z-Log2Cine get one more stop in high light (Compare with Z-Log2)
+* The DR under midlle grey is affected by SNR.
+
+*Check [spec](spec) to find out the ISO/WDR information for different model.*
 
 ## Video Encoder
 
@@ -33,6 +48,7 @@ There are 4 image profile:
 ### H.265/H.264 bitrate
 | Resolution | FR            | High(Mbps) | Medium(Mbps) | Low(Mbps) |
 |:--         | :--:          | :--:       | :--:         |:--:       |
+| 8K         | FR <=30       | 500        | 400          | 200       |
 | 4K         | FR <=30       | 200        | 130          | 60        |
 | 4K         | 30 < FR <= 60 | 230        | 150          | 100       |
 | 4K         | 60 < FR       | 300        | 200          | 160       |
