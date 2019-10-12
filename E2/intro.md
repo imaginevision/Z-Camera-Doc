@@ -129,7 +129,11 @@ The WiFi in E2 work as a Access Point, connect your computer/smart phone to E2 t
 It's compatible with [SONY's LANC](http://www.boehmel.de/lanc.htm).
 
 ### Serial port
-TTL & RS232 level are supported
+In E2 series, we provide two types of serial port:
+- Virtual serial, USB CDC ACM
+- Real serial, TTL & RS232 level are supported in standard E2, TTL on E2 flagship.
+
+Check the [sample code](uart/example) for reference.
 
 ## Overlay
 ### Exposure
