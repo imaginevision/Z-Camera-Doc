@@ -152,6 +152,19 @@ We provide this feature both on iOS app and camera.
 ### Peak
 We provide this feature both on iOS app and camera.
 
+## Scope
+- Waveform
+- Parade
+- Vector scope
+
+## LUT on preview
+x33 size cube format LUT is supported. We have some buildin LUT inside the camera, use it in "System -> Load LUT".
+
+Also, we could import the external LUT to camera and iOS app. Put your LUT file to /MISC/looks/preview, then use the menu to import it.
+
+## User Profile
+We group some of the settings to user profile, you can import/export/rename it under /MISC/profile/.
+
 ## Multiple camera sync
 E2 can do the pixel-synced recording. Cameras work in a chained connection. One master camera and multiple slave cameras. The master will generate the sync signal to all of the slave camera.
 
