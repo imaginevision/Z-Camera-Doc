@@ -2,6 +2,7 @@
 - [Basic information](intro.md)
 - [HTTP Protocol](http.md)
 - [Serial Port Protocol](uart)
+- [LANC Protocol](lanc.md)
 - [STP file](design/e2_3d.zip)
 
 ## Camera spec
