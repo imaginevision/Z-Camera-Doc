@@ -51,7 +51,7 @@ typedef struct {
     unsigned char opcode;
     unsigned char len;
     unsigned char cmd;
-    unsigned char key;
+    unsigned short key;
     unsigned short crc16;
 } FRAME_GET_CONFIG;
 
@@ -60,7 +60,7 @@ typedef struct {
     unsigned char opcode;
     unsigned char len;
     unsigned char cmd;
-    unsigned char key;
+    unsigned short key;
     unsigned char type;     /* CAMERA_CONFIG_TYPE_CHOICE or CAMERA_CONFIG_TYPE_RANGE */
     unsigned char payload[240];
 } FRAME_SET_CONFIG;
@@ -150,9 +150,9 @@ int encode_msg_get_camera_config(unsigned char * buf, int len, int key, unsigned
     FRAME_GET_CONFIG *fr = (FRAME_GET_CONFIG *)buf;
     fr->sof = 0xEA;
     fr->opcode = 0x02;
-    fr->len = 0x02;
-    fr->cmd = UART_GET_CONFIG;
-    fr->key = key;
+    fr->len = 0x03;
+    fr->cmd = UART_GET_CONFIG_EXT;
+    fr->key = BigLittleSwap16(key);
     if(crc_enable) {
         fr->len += 2;
         fr->crc16 = BigLittleSwap16(crc16(0xffff, buf, 5));
@@ -166,20 +166,20 @@ int encode_msg_set_camera_config(unsigned char * buf, int len, struct camera_con
     fr->sof = 0xEA;
     fr->opcode = 0x02;
     //fr->len = 0x02;
-    fr->cmd = UART_SET_CONFIG;
-    fr->key = cfg->key;
+    fr->cmd = UART_SET_CONFIG_EXT;
+    fr->key = BigLittleSwap16(cfg->key);
     fr->type = cfg->type;
 
     if(fr->type == CAMERA_CONFIG_TYPE_CHOICE) {
         *(short *)fr->payload = BigLittleSwap16(cfg->u.choice.current_value);
-        fr->len = 5;
+        fr->len = 6;
     } else if(fr->type == CAMERA_CONFIG_TYPE_RANGE) {
         *(int *)fr->payload = BigLittleSwap32(cfg->u.range.current_value);
-        fr->len = 7;
+        fr->len = 8;
     } else if(fr->type == CAMERA_CONFIG_TYPE_STRING) {
         int len = strlen(cfg->u.string);
         memcpy(fr->payload, cfg->u.string, len);
-        fr->len = 3+ len;
+        fr->len = 4+ len;
     }
     if(crc_enable) {
         fr->len += 2;

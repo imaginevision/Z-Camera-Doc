@@ -51,56 +51,56 @@ enum {
 enum {
     UART_CMD_NONE = 0x0,
     UART_EMULATE_KEY,        // | cmd | RC_CODE_* |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_SWITCH_TO_REC,      // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
 
     UART_SWITCH_TO_STILL,      // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
 
     UART_SWITCH_TO_PB,       // | cmd |
-    // | ack | ok/ng |
-    UART_START_REC,          // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
+    UART_START_REC,          //5 | cmd |
+                            // | ack | ok/ng |
     UART_STOP_REC,           // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_CAPTURE,            // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_CAPTURE_AF,         // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_AF,                 // | cmd |
-    // | ack | ok/ng |
-    UART_START_PB,           // | cmd | folder index | file index[1] | file index[0]
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
+    UART_START_PB,           //10 | cmd | folder index | file index[1] | file index[0]
+                            // | ack | ok/ng |
     UART_STOP_PB,            // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_PAUSE_PB,           // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_RESUME_PB,          // | cmd |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_SET_CONFIG,         // | cmd | key | type | value[n]
-    // | ack | ok/ng |
-    UART_GET_CONFIG,         // | cmd | key |
+                            // | ack | ok/ng |
+    UART_GET_CONFIG,         //15 | cmd | key |
     UART_SET_WIFI,           // | cmd | type |
-    // | ack | ok/ng |
+                            // | ack | ok/ng |
     UART_GET_WIFI,           // | cmd |
-    // | ack | ok/ng | on/off |
+                            // | ack | ok/ng | on/off |
     UART_GET_BATTERY,        // | cmd |
-    // | ack | ok/ng | battery |
+                            // | ack | ok/ng | battery |
     UART_GET_CARD_STATUS,    // | cmd |
-    // | ack | 0/1 |
-    UART_GET_MODE,           // | cmd |
-    // | ack | ok/ng | mode|
+                            // | ack | 0/1 |
+    UART_GET_MODE,           //20 | cmd |
+                            // | ack | ok/ng | mode|
     UART_GET_STATUS,         // | cmd |
-    // | ack | ok/ng | status |
+                            // | ack | ok/ng | status |
     UART_GET_REC_REMAINING,  // | cmd |
-    // | ack | ok/ng | 4 byte(minutes)|
+                            // | ack | ok/ng | 4 byte(minutes)|
     UART_GET_STILL_REMAINING,// | cmd |
-    // | ack | ok/ng | 4 byte (amount of capture) |
+                            // | ack | ok/ng | 4 byte (amount of capture) |
     UART_FORMAT_CARD,        // | cmd |
-    // | ack |
-    UART_GET_BT_VERSION,     // | cmd |
-    // | ack | ok/ng | major | minor |
+                            // | ack |
+    UART_GET_BT_VERSION,     //25 | cmd |
+                            // | ack | ok/ng | major | minor |
 
     /* note: this cmd will disable camera timelapse or burst */
     UART_SWITCH_TO_MULTIPLE_MODE_CAPTURE,
@@ -118,6 +118,12 @@ enum {
     UART_LANC_CONTROL,
     UART_CRC_VALID_CONFIG,
     UART_PTZ_CONTROL,       //40
+    UART_ASYN_MSG_EVENT,
+    UART_ASYN_MSG_ENABLE,
+    UART_CONFIG_UP_VALUE,
+    UART_CONFIG_DOWN_VALUE,
+    UART_SET_CONFIG_EXT,         //45
+    UART_GET_CONFIG_EXT,
 };
 
 enum uart_camera_status {
@@ -130,48 +136,6 @@ enum uart_camera_status {
     UART_CAMERA_STATUS_STILL_MODE = 0x40,
     UART_CAMERA_STATUS_STILL_MODE_TIMELAPSE_IDLE,
     UART_CAMERA_STATUS_STILL_MODE_TIMELAPSE_ING
-};
-
-// camera to uart
-enum {
-    UART_NOTIFY_CAMERA_APP_ON,           // | noti |
-    UART_NOTIFY_BATTERY_LEVEL,           // | noti | value (1byte) |
-    UART_NOTIFY_MODE_CHANGED,            // | noti | new mode (1 byte) |
-    UART_NOTIFY_RECORD_STARTED,          // | noti |
-    UART_NOTIFY_RECORD_STOPED,           // | noti |
-    UART_NOTIFY_CONFIG_CHANGED,          // | noti | config key (1 byte) | value (if it has, 4byte)|
-    UART_NOTIFY_UPDATE_RECORD_INFO,      // | noti | duration sec (4 bytes) |
-    UART_NOTIFY_UPDATE_RECORD_REMAINING, // | noti | duration min (4 bytes) |
-    UART_NOTIFY_SDCARD_EVENT,            // | noti | slot (uint16) | action (uint16) |
-    //  slot should be 2
-    //  action (1 << 1) card ejected, (1 << 8) card mount
-    UART_NOTIFY_THROUGHPUT_DATA,        // | noti | data |
-    UART_NOTIFY_UPDATE_PB_INFO,          // | noti | 4 byte (second) |
-    UART_NOTIFY_PB_STARTED,              // | noti |
-    UART_NOTIFY_PB_STOPED,               // | noti |
-    UART_NOTIFY_PB_PAUSED,               // | noti |
-    UART_NOTIFY_PB_RESUMED,              // | noti |
-
-    UART_NOTIFY_STILL_CAPTURE_DONE,      // | noti |
-    UART_NOTIFY_UPDATE_STILL_REMAINING,   // | noti | 4 byte |
-    UART_NOTIFY_UPDATE_PHOTO_TIMELAPSE_DURATION,
-    UART_NOTIFY_CLEAR_SETTING,            // | noti |
-    UART_NOTIFY_STILL_CAPTURE_START,      // | noti |
-    UART_NOTIFY_PHOTO_TIMELAPSE_STARTED,    // | noti |
-    UART_NOTIFY_PHOTO_TIMELAPSE_STOPED,     // | noti |
-};
-
-enum {
-    UART_X_CONFIG_KEY_DRIVE_MODE,
-    UART_X_CONFIG_KEY_FN,
-    UART_X_CONFIG_KEY_AUTO_OFF,
-    UART_X_CONFIG_KEY_PHOTO_TIMELAPSE_INTERVAL,
-    UART_X_CONFIG_KEY_PHOTO_TIMELAPSE_NUM,
-    UART_X_CONFIG_KEY_CAF,
-    UART_X_CONFIG_KEY_F2,
-    UART_X_CONFIG_KEY_AUTO_OFF_LCD,
-    UART_X_CONFIG_KEY_PHOTO_SELF_TIMER_INTERVAL,
-    UART_X_CONFIG_KEY_NUM,
 };
 
 typedef enum {
