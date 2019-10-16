@@ -3,9 +3,9 @@
 - [STP file](design/e2_3d.zip)
 
 ## Control protocol
-- [HTTP Protocol](protocol/http.md)
-- [Serial Port Protocol](protocol/uart)
-- [LANC Protocol](protocol/lanc.md)
+- [HTTP](protocol/http.md)
+- [Serial](protocol/uart)
+- [LANC](protocol/lanc.md)
 
 ## Camera spec
 - [E2](spec/E2_spec.md)

@@ -1,6 +1,6 @@
 ## Image Profile
 
-There are 4 image profile:
+There are 5 image profiles:
 - Rec.709
 - Z-Log2
 - Z-Log2Cine, one more stop in high light than Z-Log2. (E2-F6 only)
