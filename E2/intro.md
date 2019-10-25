@@ -27,14 +27,16 @@ Take E2 as example.
 
 ## Video Encoder
 
-| Video Encoder     | 3840x2160 (Low Noise)   | 4096x2160 (Low Noise))     | 3840x2160       | 4096x2160       | 3840x2160 4K 2.4:1   | 4096x2160 DCI4K 2.4:1 | 1920x1080 HD |  3696x2772 4:3     | 3312x2760 6:5    |  2704x1600      |
-| :---              | :---:                   | :--:                       | :--:            | :--:            | :--:                 | :--:                  | :---:        |     :---:          |    :---:         |     :---:       |
-| H.264             | FR <= 30                | FR <= 30                   | FR <= 60        | FR <= 60        | FR <= 60             | FR <= 60              | FR <= 120    |  FR <= 60          | FR <= 60         | FR <= 60        |
-| H.265             | FR <= 30                | FR <= 30                   | FR <= 120       | FR <= 120       | FR <= 160            | FR <= 150             | FR <= 240    |  FR <= 60          | FR <= 60         | FR <= 160       |
-| ProRes 422 Proxy  | FR <= 30                | FR <= 30                   | FR <= 75        | FR <= 75        | FR <= 75             | FR <= 75              | FR <= 120    |  FR <= 60          | FR <= 60         | FR <= 75        |
-| ProRes 422 LT     | FR <= 30                | FR <= 30                   | FR <= 75        | FR <= 60        | FR <= 75             | FR <= 60              | FR <= 120    |  FR <= 60          | FR <= 60         | FR <= 75        |
-| ProRes 422        | FR <= 30                | FR <= 30                   | FR <= 60        | FR <= 60        | FR <= 60             | FR <= 60              | FR <= 120    |  FR <= 50          | FR <= 60         | FR <= 75        |
-| ProRes 422 HQ     | FR <= 30                | FR <= 30                   | FR <= 50        | FR <= 30        | FR <= 60             | FR <= 50              | FR <= 120    |  FR <= 30          | FR <= 30         | FR <= 75        |
+| Video Encoder     | 6K/C6K     | 3840x2160       | 4096x2160       | 3840x2160 4K 2.4:1   | 4096x2160 C4K 2.4:1   | 1920x1080 HD |  3696x2772  | 3312x2760 |  2704x1600      |
+| :---              | :---:      | :--:            | :--:            | :--:                 | :--:                  | :---:        |     :---:   |    :---:  |     :---:       |
+| H.264             | FR <= 30   | FR <= 60        | FR <= 60        | FR <= 60             | FR <= 60              | FR <= 120    |  FR <= 60   | FR <= 60  | FR <= 60        |
+| H.265             | FR <= 30   | FR <= 120       | FR <= 120       | FR <= 160            | FR <= 150             | FR <= 240    |  FR <= 60   | FR <= 60  | FR <= 160       |
+| ProRes 422 Proxy  | FR <= 30   | FR <= 75        | FR <= 75        | FR <= 75             | FR <= 75              | FR <= 120    |  FR <= 60   | FR <= 60  | FR <= 75        |
+| ProRes 422 LT     | FR <= 30   | FR <= 75        | FR <= 60        | FR <= 75             | FR <= 60              | FR <= 120    |  FR <= 60   | FR <= 60  | FR <= 75        |
+| ProRes 422        | FR <= 30   | FR <= 60        | FR <= 60        | FR <= 60             | FR <= 60              | FR <= 120    |  FR <= 50   | FR <= 60  | FR <= 75        |
+| ProRes 422 HQ     | NA         | FR <= 50        | FR <= 30        | FR <= 60             | FR <= 50              | FR <= 120    |  FR <= 30   | FR <= 30  | FR <= 75        |
+
+
 
 - ProRes is only supported in MOV format
 - H.264 is not supported when you use HLG
@@ -49,6 +51,8 @@ Take E2 as example.
 | Resolution | FR            | High(Mbps) | Medium(Mbps) | Low(Mbps) |
 |:--         | :--:          | :--:       | :--:         |:--:       |
 | 8K         | FR <=30       | 500        | 400          | 200       |
+| 6K         | FR <=30       | 250        | 160          | 100       |
+| 6K         | 30 < FR <=60  | 300        | 190          | 130       |
 | 4K         | FR <=30       | 200        | 130          | 60        |
 | 4K         | 30 < FR <= 60 | 230        | 150          | 100       |
 | 4K         | 60 < FR       | 300        | 200          | 160       |
