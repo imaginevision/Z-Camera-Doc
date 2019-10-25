@@ -47,8 +47,6 @@ Frame format:
 
 [55] [54] [emulate key] <config key(4 Bytes)>
 
-##### Custom emulate key(play back)
-
 | command | example(HEX) |   back          |
 | :---        | :---            |  :---            |
 | power press | 55 54 0a 00 00 00 00 00 |  short press (1s > x <0.5s)switch to Playback mode |
@@ -61,7 +59,15 @@ Frame format:
 | down release | 55 54 08 00 00 00 00 00 | |
 
 
-##### Custom emulate key(config value up/down)
+##### Config value up/down
+Frame format:
+
+[55] [54] [up/down (1 byte)] [config key (4 bytes)] [00]
+
+0d : down
+
+0e : up
+
 | command | example(HEX) |
 | :---        | :---            |
 | ISO - | 55 54 0d 00 00 00 03 00 |
