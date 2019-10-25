@@ -65,32 +65,7 @@ The maximum resolution is 4096x2160@60fps 10bit 4:2:2.
 
 Most of time, the HDMI output resolution is determined by EDID from the monitor.
 
-Due to performance limitations, the maximum output would be changed to 720@60fps/1080@50fps/1080@60fps depends on encoder, frame rate and resolution.
-
-- 720P60
-
-| Encoder      | FR       | Resolution         |
-| :--          | :--      | :--:               |
-| ProRes 422   | FR = 60  | 4096x2160 DCI4K    |
-
-- 1080P50
-
-| Encoder         | FR          | Resolution                                                      |
-| :--             | :--:        | :--:                                                            |
-| ProRes 422      | FR = 50     | 3840x2160 4K / 4096x2160 DCI4K / 3696x2772 4:3 / 3312x2760 6:5  |
-| ProRes 422 HQ   | FR = 50     | 3840x2160 4K / 4096x2160 DCI4K 2.4:1                            |
-
-- 1080P60
-
-| Encoder         | FR           |  Resolution                                                                                                             |
-| :--             | :--:         |  :--                                                                                                                    |
-| ProRes 422 LT   | FR = 60      |  3696x2772 4:3                                                                                                          |
-| ProRes 422 LT   | FR = 75      |  3840x2160 4K                                                                                                           |
-| ProRes 422      | FR = 60      |  3840x2160 4K / 3312x2760 6:5                                                                                           |
-| ProRes 422 HQ   | FR = 45      |  3840x2160 4K                                                                                                           |
-| ProRes 422 HQ   | FR = 48      |  4096x2160 DCI4K 2.4:1   / 3840x2160 4K                                                                                 |
-| ProRes 422 HQ   | FR = 60      |  3840x2160 4K 2.4:1                                                                                                     |
-| Any             | FR>= 100     |  Any                  
+Due to performance limitations, the maximum output would be limited to 720@60fps/1080@50fps/1080@60fps depends on encoder, frame rate and resolution.  
 
 ## Audio Encoder
 | File Format | AAC | PCM | None |
@@ -100,17 +75,8 @@ Due to performance limitations, the maximum output would be changed to 720@60fps
 
 If you don't want to record the audio, you can choose None.
 
-## Proxy File
-Right now, playback the RAW/ProRes file is not supported in camera. So we need to turn on the proxy file recording, a H.264 file is for proxy.
-
-In some cases, camera can not record the proxy file:
-
-- H.264 / H.265, high bitrate
-- ProRes 422 HQ, FR >=48, 3840x2160
-- ProRes 422,    FR >=60, 4096x2160
-
 ## Battery Life
-Based on a fully charged NP-F970.
+Based on a fully charged NP-F970. (E2)
 
 | Resolution | VFR | Duration |
 | :-----|:----- | :-----|
