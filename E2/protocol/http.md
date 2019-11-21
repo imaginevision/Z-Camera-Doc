@@ -1,4 +1,4 @@
-Based on Z CAM E2 (firmware 0.83 or above).
+# Content
 
 [Basic of API](#Basic)
 
@@ -35,6 +35,11 @@ Based on Z CAM E2 (firmware 0.83 or above).
 [Firmware upgrade](#Firmware-upgrade)
 
 [Examples](#Examples)
+
+## Must read !!!
+
+- Based on Z CAM E2 (firmware 0.93 or above)
+- This document is not update to day, please check the /www/html/controller.html for the latest command and config key.
 
 ## Basic
  ```HTTP
@@ -131,6 +136,7 @@ GET /ctrl/mode?action=query
 | pb        | playback mode                     |
 | cap       | still capture (not in E2)         |
 | cap_burst | burst still capture (not in E2)   |
+| standby   | standby                           |
 
 *_ing means it's recording or playbacking video
 
@@ -143,6 +149,18 @@ GET /ctrl/mode?action=to_rec
 Switch to playback mode
 ```HTTP
 GET /ctrl/mode?action=to_pb
+```
+
+Switch to standby
+```HTTP
+GET /ctrl/mode?action=to_standby
+```
+
+Any command to /ctrl/* will exit the standby mode.
+
+Exit standby
+```HTTP
+GET /ctrl/mode?action=exit_standby
 ```
 
 ## Video record control
@@ -270,8 +288,8 @@ GET /ctrl/set?action=clear
 #### Video
 | key               | type    | description                         |
 | :---              |:----    |:----                                |
-| ~~movfmt         | choice  | 4KP30/4KP60/...~~               |
-| ~~resolution        | choice  | 4K/C4K/...~~                          |
+| ~~movfmt~~        | choice  | 4KP30/4KP60/...                     |
+| ~~resolution~~    | choice  | 4K/C4K/...                          |
 | project_fps       | choice  | 23.98/24/...                        |
 | record_file_format| choice  | MOV/MP4                             |
 | rec_proxy_file    | choice  | Record the proxy file               |
