@@ -1089,8 +1089,6 @@ Disable
 GET /ctrl/manual_blc?action=set&enable=0&rggb=0,0,0,0
 ```
 
-```
-
 #### Set manual R/G/B gain
 Set white balance mode to expert mode first.
 ```HTTP
