@@ -991,10 +991,76 @@ If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K
 ```HTTP
 GET /ctrl/stream_setting?index=stream0&split=5
 ```
+### Knee/Slope based curve
+It's used for some broadcast case, it could be adjusted by remote controller.
+
+Set the image profile to customized curve 2
+```HTTP
+GET /ctrl/set?lut=Customized 2
+```
+
+#### Gamma
+Choose the base curve for your adjustment, options:
+- Rec709
+- sRGB
+- Power of 2
+
+Get infomations
+```HTTP
+GET /ctrl/cusomized_image_profile?action=get&option=gamma
+```
+
+Set base curve to Rec709
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=gamma&base=0
+```
+
+Set base curve to sRGB
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=gamma&base=1
+```
+
+Set base curve to  2^2.2
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=gamma&base=2&power=22
+```
+
+#### Black level
+```HTTP
+GET /ctrl/cusomized_image_profile?action=get&option=black_level
+```
+
+Set level
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=black_level&enble=1&level=10
+```
+
+#### Black gamma
+```HTTP
+GET /ctrl/cusomized_image_profile?action=get&option=black_gamma
+```
+
+Set range and level
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=black_gamma&enable=1&range=0&level=0
+```
+
+#### Knee
+```HTTP
+GET /ctrl/cusomized_image_profile?action=get&option=knee
+```
+
+Set point and slope
+```HTTP
+GET /ctrl/cusomized_image_profile?action=set&option=knee&enable=1&point=0&slope=10
+```
 
 ### Manual black level and rgb gain
 
 #### Manual black level adjustment
+
+Run on the raw data, substract the dark current value.
+
 Get status
 ```HTTP
 GET /ctrl/manual_blc?action=get
@@ -1021,6 +1087,8 @@ GET /ctrl/manual_blc?action=set&enable=1&rggb=r_value,gr_value,gb_value,b_value
 Disable
 ```HTTP
 GET /ctrl/manual_blc?action=set&enable=0&rggb=0,0,0,0
+```
+
 ```
 
 #### Set manual R/G/B gain
