@@ -45,18 +45,30 @@ supported config key reference
 
 Frame format:
 
-[55] [54] [emulate key] <config key(4 Bytes)>
+[55] [54] [emulate key]
 
 | command | example(HEX) |   back          |
 | :---        | :---            |  :---            |
-| power press | 55 54 0a 00 00 00 00 00 |  short press (1s > x <0.5s)switch to Playback mode |
-| power release | 55 54 0b 00 00 00 00 00 | |
-| return press | 55 54 01 00 00 00 00 00 |  enter/ok/play/pause |
-| return release | 55 54 06 00 00 00 00 00 | |
-| up press | 55 54 02 00 00 00 00 00 | select the prev file |
-| up release | 55 54 07 00 00 00 00 00 | |
-| down press | 55 54 03 00 00 00 00 00 | select the next file|
-| down release | 55 54 08 00 00 00 00 00 | |
+| Power press | 55 54 0a 00 00 00 00 00 |  short press (1s > x <0.5s)switch to Playback mode |
+| Power release | 55 54 0b 00 00 00 00 00 | |
+| OK press | 55 54 01 00 00 00 00 00 |  enter/ok/play/pause |
+| OK release | 55 54 06 00 00 00 00 00 | |
+| Up press | 55 54 02 00 00 00 00 00 | up |
+| Up release | 55 54 07 00 00 00 00 00 | |
+| Down press | 55 54 03 00 00 00 00 00 | down |
+| Down release | 55 54 08 00 00 00 00 00 | |
+| Menu press | 55 54 15 00 00 00 00 00 | menu |
+| Menu release | 55 54 16 00 00 00 00 00 | |
+| Rec press | 55 54 17 00 00 00 00 00 | rec start/sop |
+| Rec release | 55 54 18 00 00 00 00 00 | |
+| F1 press | 55 54 00 00 00 00 00 00 | |
+| F1 release | 55 54 05 00 00 00 00 00 | |
+| F2 press | 55 54 0F 00 00 00 00 00 | |
+| F2 release | 55 54 10 00 00 00 00 00 | |
+| F3 press | 55 54 11 00 00 00 00 00 | |
+| F3 release | 55 54 12 00 00 00 00 00 | |
+| Fn press | 55 54 13 00 00 00 00 00 | Fn |
+| Fn release | 55 54 14 00 00 00 00 00 | |
 
 
 ##### Config value up/down
