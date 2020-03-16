@@ -88,5 +88,6 @@ Frame format:
 | shutter speed  + | 55 54 0e 00 00 00 64 00 |
 | iris/aperture - | 55 54 0d 00 00 00 15 00 |
 | iris/aperture + | 55 54 0e 00 00 00 15 00 |
-
+| eND - | 55 54 0d 00 00 00 b4 00 |
+| eND + | 55 54 0e 00 00 00 b4 00 |
 
