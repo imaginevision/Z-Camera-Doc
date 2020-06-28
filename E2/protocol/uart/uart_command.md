@@ -56,8 +56,10 @@
 | :---    | :---             |
 | F1 press      |  EA 02 02 01 00 |
 | F1 release    |  EA 02 02 01 05 |
-| REC press     |  EA 02 02 01 01 |
-| REC release   |  EA 02 02 01 06 |
+| OK press     |  EA 02 02 01 01 |
+| OK release   |  EA 02 02 01 06 |
+| Menu press     |  EA 02 02 01 15 |
+| Menu release   |  EA 02 02 01 16 |
 | UP press      |  EA 02 02 01 02 |
 | UP release    |  EA 02 02 01 07 |
 | DOWN press    |  EA 02 02 01 03 |
