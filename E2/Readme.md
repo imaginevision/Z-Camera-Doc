@@ -1,5 +1,6 @@
 ## General resource
 - [Basic information](intro.md)
+- [HowTo](howto)
 - [STP file](design/e2_3d.zip)
 
 ## Control protocol
