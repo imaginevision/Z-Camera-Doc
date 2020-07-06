@@ -14,7 +14,7 @@ There are 5 image profiles:
 ## Dynamic Range
 Take E2 as example.
 
-![DR](dr.png)
+![DR](images/dr.png)
 
 * Based on Z-Log2
 * '*' means native ISO
@@ -131,7 +131,7 @@ We support two Zebra settings:
 - under exposure 
 
 #### False Color
-![False Color](false_color.jpg)
+![False Color](images/false_color.jpg)
 
 We provide this feature both on iOS app and camera.
 
