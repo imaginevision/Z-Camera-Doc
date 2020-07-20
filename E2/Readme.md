@@ -1,7 +1,7 @@
 ## General resource
 - [Basic information](intro.md)
 - [HowTo](howto)
-- [STP file](design/)
+- [3D file](design/)
 
 ## Control protocol
 - [HTTP](protocol/http.md)
