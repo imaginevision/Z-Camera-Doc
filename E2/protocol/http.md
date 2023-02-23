@@ -736,7 +736,7 @@ GET /ctrl/set?lens_zoom=stop
 ```HTTP
 GET /ctrl/set?lens_zoom_pos=0
 ```
-The range of the zoom position is 0-31
+The range of the zoom position is 0-255
 
 
 ## Magnify the preview
