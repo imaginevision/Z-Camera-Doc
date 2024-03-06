@@ -991,10 +991,10 @@ If VFR is on, and playback frame is default. e.g. VFR is 120, movie format is 4K
 ```HTTP
 GET /ctrl/stream_setting?index=stream0&split=5
 ```
-### Knee/Slope based curve
+## Knee/Slope based curve
 It's used for some broadcast case, it could be adjusted by remote controller.
 
-Set the image profile to customized curve 2
+Set the image profile to 'customized curve 2', to activate Gamma/Black Level/Black Gamma/Knee features
 ```HTTP
 GET /ctrl/set?lut=Customized 2
 ```
@@ -1032,7 +1032,7 @@ GET /ctrl/cusomized_image_profile?action=get&option=black_level
 
 Set level
 ```HTTP
-GET /ctrl/cusomized_image_profile?action=set&option=black_level&enble=1&level=10
+GET /ctrl/cusomized_image_profile?action=set&option=black_level&enable=1&level=10
 ```
 
 #### Black gamma
