@@ -30,16 +30,14 @@
 
 [File management](#File-management)
 
-[Asyc notification](#Asyc-notification)
-
-[Firmware upgrade](#Firmware-upgrade)
+[WebSockets](#WebSockets)
 
 [Examples](#Examples)
 
 ## Must read !!!
 
-- Based on Z CAM E2 (firmware 0.93 or above)
-- This document is not update to day, please check the /www/html/controller.html for the latest command and config key.
+- Based on the latest firmware.
+- Please check the [referece code](api.js) for the latest command.
 
 ## Basic
  ```HTTP
@@ -55,7 +53,7 @@
 ```
 
 ## Get camera information
-You can use this command as 'ping' to see if the camera is OK.
+You can use this command as 'ping' to see if the camera is avaliable.
 
 ```HTTP
 GET /info
@@ -64,9 +62,7 @@ GET /info
 ```javascript
 {
     "model": "...",   // model of camera
-    "number": "1",// how many deivce in camera
-    "sw": "0.82", // fw version
-    "hw": "1",// hw version
+    "sw": "1.0.0", // fw version
     "mac": "4e:4:b8:2d:78:db", // mac address
     "eth_ip": "192.168.9.81",  // ethernet ip address
     "sn": "329A0010009"// camera serial number
@@ -74,19 +70,26 @@ GET /info
 }
 ```
 ## Session
-Only one client can control the camera at the same time.
 
-You can try to get the session in the following interface, status code 409 means that you are failed to get the session.
+Most of the command under /ctrl/* require the ownership of session.
+
+Check session status, HTTP code 409 means that you are failed to get the session.
 ```HTTP
 GET /ctrl/session
 ```
-Most of the command under /ctrl/* requeir the ownership of session.
 
 Quit the session. 
 
 Once you leave your control application, you'd better to quit the session.
 ```HTTP
 GET /ctrl/session?action=quit 
+```
+
+Occupy the session
+
+Other cliet can NOT controll the camera before you quit this session.
+```HTTP
+GET /ctrl/session?action=occupy
 ```
 
 ## Date/Time
@@ -270,171 +273,8 @@ GET /ctrl/set?key=value
 }
 ```
 
-e.g.
-
-```HTTP
-GET /ctrl/set?video_system=PAL
-GET /ctrl/set?contrast=95
-```
-
-### Clear
-Depends on different firmware implementaion, the camera would be reboot.
-```HTTP
-GET /ctrl/set?action=clear
-```
-
 ### Supported keys
-
-#### Video
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| ~~movfmt~~        | choice  | 4KP30/4KP60/...                     |
-| ~~resolution~~    | choice  | 4K/C4K/...                          |
-| project_fps       | choice  | 23.98/24/...                        |
-| record_file_format| choice  | MOV/MP4                             |
-| rec_proxy_file    | choice  | Record the proxy file               |
-| video_encoder     | choice  | h264/h265/..                        |
-| split_duration    | choice  | video record split duration         |
-| bitrate_level     | choice  | low/medium/high                     |
-| compose_mode      | choice  | Normal/WDR                          |
-| movvfr            | choice  | Variable Framerate                  |
-| rec_fps           | choice  | Playback Framerate                  |
-| video_tl_interval | range   | video timelapse interval            |
-| enable_video_tl   | choice  | query is the camera support video timelapse  |
-| rec_duration      | range   | query the recording duration, in second |
-| last_file_name    | string  | query the last record file name     |
-
-#### Focus & Zoom
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| focus             | choice  | AF/MF                               |
-| af_mode           | choice  | Flexiable Zone/Human Detection      |
-| mf_drive          | range   | move the focus plane far/near       |
-| lens_zoom         | choice  | lens zoom in/out                    |
-| ois_mode          | choice  | lens ois mode                       |
-| af_lock           | choice  | af lock/unlock                      |
-| lens_zoom_pos     | range   | lens zoom position                  |
-| lens_focus_pos    | range   | lens focus position                 |
-| lens_focus_spd    | range   | control the speed of mf_drive/lens_focus_pos |
-| caf               | choice  | Continious AF On/Off                     |
-| caf_sens          | choice  | CAF sensitivity                          |
-| live_caf          | choice  | On/Off                                   |
-| mf_mag            | choice  | Magnify the preview if we tunning the MF |
-| restore_lens_pos  | choice  | Restore lens position after reboot       |
-
-#### Exposure
-| key                   | type    | description                         |
-| :---                  |:----    |:----                                |
-| meter_mode            | choice  | AE meter mode                       |
-| max_iso               | choice  | max iso                             |
-| ev                    | range   | **deprecated**                      |
-| ev_choice             | choice  | EV -3/.../0/.../3                   |
-| iso                   | choice  | Auto/../200/../max iso              |
-| iris                  | choice  | aperture                            |
-| shutter_angle         | choice  | Auto/../45/90/../360                |
-| max_exp_shutter_angle | choice  | max video shutter angle             |
-| shutter_time          | choice  | shutter time                        |
-| max_exp_shutter_time  | choice  | max video shutter time              |
-| sht_operation         | choice  | speed/angle                         |
-| dual_iso              | choice  | Auto/Low/High                       |
-| ae_freeze             | choice  | ae lock/unlock                      |
-| live_ae_fno           | choice  | live value of F-number, readonly    |
-| live_ae_iso           | choice  | live value of ISO, readonly         |
-| live_ae_shutter       | choice  | live value of shutter time, readonly|
-| live_ae_shutter_angle | choice  | live value of shutter angle, readonly|
-
-#### White Balance
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| wb                | choice  | Auto/Manual                         |
-| mwb               | range   | manual white banlance kelvin        |
-| tint              | range   | manual white banlance tint          |
-| wb_priority       | choice  | Ambiance/White                      |
-| mwb_r             | range   | manual white banlance r gain        |
-| mwb_g             | range   | manual white banlance g gain        |
-| mwb_b             | range   | manual white banlance b gain        |
-
-#### Image
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| sharpness         | choice  | Strong/Normal/Weak                  |
-| contrast          | range   | contrast                            |
-| saturation        | range   | saturation                          |
-| brightness        | range   | brightness                          |
-| lut               | choice  | rec709/zlog                         |
-| luma_level        | choice  | 0-255/16-235                        |
-| vignette          | choice  | **Not support in E2**               |
-
-#### Stream
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| send_stream       | choice | stream0/stream1                      |
-
-#### Audio
-| key                   | type    | description                     |
-| :---                  |:----    |:----                            |
-| primary_audio         | choice  | AAC/PCM                         |
-| audio_channel         | choice  | audio input channel             |
-| audio_input_gain      | range   | audio input gain                |
-| audio_output_gain     | range   | audio output gain               |
-| audio_phantom_power   | choice  | On/Off                          |
-| ain_gain_type         | choice  | AGC/MGC                         |
-
-#### Timecode
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| tc_count_up       | choice  | free run / record run               |
-| tc_hdmi_dispaly   | choice  | Display TC on HDMI                  |
-| tc_drop_frame     | choice  | DF/NDF                              |
-
-#### Assist tool
-| key                   | type   | description                      |
-| :---                  |:----   |:----                             |
-| assitool_display      | choice | On/Off                           |
-| assitool_peak_onoff   | choice | On/Off                           |
-| assitool_peak_color   | choice | peak color                       |
-| assitool_exposure     | choice | Zebra/False Color                |
-| assitool_zera_th1     | range  | Zebra high value                 |
-| assitool_zera_th2     | range  | Zebra low value                  |
-
-#### Misc
-| key               | type    |description                          |
-| :---              |:----    |:----                                |
-| ssid              | string  | Wi-Fi SSID                          |
-| flicker           | choice  | Flicker reduction, 50Hz/60Hz        |
-| video_system      | choice  | NTSC/PAL/CINEMA                     |
-| wifi              | choice  | On/Off                              |
-| battery           | range   | battery percentage                  |
-| led               | choice  | LED on/off                          |
-| lcd_backlight     | range   | lcd backlignt level                 |
-| hdmi_fmt          | choice  | Auto/4KP60/4KP30/...                |
-| hdmi_osd          | choice  | HDMI On Screen Display              |
-| usb_device_role   | choice  | Host/Mass storage/Network           |
-| uart_role         | choice  | Pelco D/Controller                  |
-| auto_off          | choice  | Camera auto off                     |
-| auto_off_lcd      | choice  | LCD auto off                        |
-| sn                | string  | serial number of the camera         |
-| desqueeze         | choice  | desqueeze display:1x/1.33x/1.5x/2x  |
-
-##### Multiple Camera
-| key               | type    |description                          |
-| :---              |:----    |:----                                |
-| multiple_mode     | choice  | single/master/slave                 |
-| multiple_id       | range   | multiple camera id                  |
-
-**Photo Settings are not supported in E2**
-
-| key               | type    | description                         |
-| :---              |:----    |:----                                |
-| photosize         | choice  | photo resolution                    |
-| photo_q           | choice  | JPEG/RAW                            |
-| burst             | choice  |                                     |
-| max_exp           | choice  | max exposure time                   |
-| shoot_mode        | choice  | AE exposuer mode:P/A/S/M            |
-| drive_mode        | choice  | single/burst/timelpase              |
-| photo_tl_interval | range   | photo timelpase interval            |
-| photo_tl_num      | range   | photo timelpase number              |
-| photo_self_interval| range  | interval for selfie                 |
+Check the check [referece code](api.js).
 
 ## Network setting
 E2's Ethernet supports three IP modes:
@@ -495,11 +335,10 @@ GET /ctrl/set?send_stream=Stream1
 ```
 
 ### Buildin stream service
-We have build some stream services inside the camera. You can use them in an easy way.
 
 - MJPEG over HTTP
 
-  Basically, it's for debug. As the compression efficiency of MJPEG is not good, it use a larger bandwidth than H.264/H.265. You can use it as a quick solution to see what happen in the scene.
+    **Not every model support the MJPEG over HTTP**
     ```HTTP
     GET /mjpeg_stream
     ```
@@ -512,6 +351,8 @@ We have build some stream services inside the camera. You can use them in an eas
 - SSP
 
   See [libssp](https://github.com/imaginevision/libssp)
+- RTMP
+- SRT
 
 ### Advance setting
 
@@ -736,7 +577,6 @@ GET /ctrl/set?lens_zoom=stop
 ```HTTP
 GET /ctrl/set?lens_zoom_pos=0
 ```
-The range of the zoom position is 0-31
 
 
 ## Magnify the preview
@@ -849,7 +689,7 @@ Screennail is a larger JPEG than the thumbnail
 
 ### Get create time of the file.
 ```HTTP
-GET/DCIM/110ZCAME/ZCAM0101_0000_201811121539.MOV?act=ct 
+GET /DCIM/110ZCAME/ZCAM0101_0000_201811121539.MOV?act=ct 
 ```
 ```javascript
 {
@@ -877,64 +717,12 @@ GET /DCIM/110ZCAME/ZCAM0100_0000_201811121522.MOV?act=info
 }
 ```
 
-## Asyc notification
-We use the websocket as the notification channel, check the source code on /www/html/controller.html to see how it work.
+## WebSockets
 
 ```
-ws://host:81
+ws{s}://host:81
 ```
 
-## Firmware upgrade
-You can do a firmware upgrade via HTTP.
-
-1. Upload the firmware to camera.
-
-```javascript
-Upload.prototype.doUpload = function (args) {
-    var that = this;
-    var formData = new FormData();
-
-    // add assoc key values, this will be posts values
-    formData.append("file", this.file, this.getName());
-    // formData.append("upload_file", true);
-
-    $.ajax({
-        type: "POST",
-        url: "/uploadfirmware",
-        xhr: function () {
-            var myXhr = $.ajaxSettings.xhr();
-            if (myXhr.upload) {
-                myXhr.upload.addEventListener('progress', /*that.progressHandling*/function (event) {
-
-                }, false);
-            }
-            return myXhr;
-        },
-        success: function (data) {
-            // your callback here
-            args.done();
-        },
-        error: function (error) {
-            // handle error
-        },
-        async: true,
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        timeout: 60000
-    });
-};
-```
-2. check if the firmware is valid
-```HTTP
-GET /ctrl/upgrade?action=fw_check
-```
-
-3. do the upgrade.
-```HTTP
-GET /ctrl/upgrade?action=run
-```
 
 ## Examples
 For controlling the camera, we put a plain web page in /www/index.html to show how it work.
