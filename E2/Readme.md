@@ -4,7 +4,7 @@
 - [3D file](design/)
 
 ## Control protocol
-- [HTTP](protocol/http.md)
+- [HTTP](protocol/http/http.md)
 - [Serial](protocol/uart)
 - [LANC](protocol/lanc.md)
 

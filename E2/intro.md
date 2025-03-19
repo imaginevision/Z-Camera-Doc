@@ -85,7 +85,7 @@ Based on a fully charged NP-F970. (E2)
 
 ## Control the camera
 ### HTTP based control
-see [HTTP Protocol](protocol/http.md)
+see [HTTP Protocol](protocol/http/http.md)
 #### Ethernet
 The Ethernet work in these 3 modes:
 
