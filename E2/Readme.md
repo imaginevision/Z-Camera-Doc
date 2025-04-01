@@ -5,8 +5,9 @@
 
 ## Control protocol
 - [HTTP](protocol/http/http.md)
-- [Serial](protocol/uart)
 - [LANC](protocol/lanc.md)
+- [Serial](protocol/uart)
+- [VISCA](protocol/visca)
 
 ## Camera spec
 - [E2 & E2-M4](spec/E2_spec.md)
