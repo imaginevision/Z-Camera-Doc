@@ -8,6 +8,7 @@
 - [LANC](protocol/lanc.md)
 - [Serial](protocol/uart)
 - [VISCA](protocol/visca)
+- [FreeD](protocol/freed.md)
 
 ## Camera spec
 - [E2 & E2-M4](spec/E2_spec.md)
