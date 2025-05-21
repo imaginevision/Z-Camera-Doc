@@ -4,6 +4,7 @@
 - only support stream mode
 - data package is sent at 30fps
 - for Z-Cam PTZ product only. for example: [P2-R1](https://www.z-cam.com/p2-r1/)
+- [JS API](http/api.js)
 
 ### Start Free-D streaming in one command:
 ```
