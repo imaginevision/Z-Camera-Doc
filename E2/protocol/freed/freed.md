@@ -56,28 +56,27 @@ Response
 The D1 message is used for transferring the camera position and orientatdata from the free-d unit.
 The message contains 29 bytes as follows.
 
-		<D1>                Message type
+        <D1>                Message type
         <CA>                Camera ID
-        <PH><PM><PL>        Camera Pan Angle   (Yaw)        described in degree
-        <TH><TM><TL>        Camera Tilt Angle  (Pitch)      described in degree
-        <RH><RM><RL>        Camera Roll Angle  (Roll)       described in degree
+        <PH><PM><PL>        Camera Pan Angle                described in degree
+        <TH><TM><TL>        Camera Tilt Angle               described in degree
+        <RH><RM><RL>        Camera Roll Angle               described in degree
         <XH><XM><XL>        Camera X-Position               described in millimeter
         <YH><YM><YL>        Camera Y-Position               described in millimeter
         <HH><HM><HL>        Camera Height (Z-Position)      described in millimeter
-        <ZH><ZM><ZL>        Camera Zoom                     0x0000(WIDE) ~ 0x4000(TELE)
-        <FH><FM><FL>        Camera Focus                    0xF000(NEAR) ~ 0x1000(FAR) 
+        <ZH><ZM><ZL>        Camera Zoom                     real focal length in (mm*100)
+        <FH><FM><FL>        Camera Focus                    real focus distance in (mm*10)
         <SH><SL>            Iris and Seq. (16 bits)         FNo and a sequence number
         <CK>                Checksum
 
 Note:
     Camera ID : [0~255]
     Pan Angle : [-175 ~ +175] degree
-	Tilt Angle: [-30  ~ +90]  degree
-	Roll,X,Y,Z: Always 0
-	Zoom:  0x0000(WIDE) ~ 0x4000(TELE)
-    Focus: 0xF000(NEAR) ~ 0x1000(FAR) 
+    Tilt Angle: [-30  ~ +90]  degree
+    Roll,X,Y,Z: Always 0
+          Zoom:   950 means   9.50 mm
+         Focus: 12300 means 1230.0 mm
     <SH><SL> Iris and Seq:
         Iris: bit 0~11;    F2.8->280->0x118 => 0x1, 0x18
         Seq:  bit 12~15;   mod(frame_seq). seq%16
-
 ```
