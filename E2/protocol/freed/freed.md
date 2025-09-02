@@ -2,7 +2,7 @@
 ## Free-D Protocol
 
 - only support stream mode
-- data package is sent at 30fps
+- data package is sent at project framerate
 - for Z-Cam PTZ product only. for example: [P2-R1](https://www.z-cam.com/p2-r1/)
 - [JS API](http/api.js)
 
@@ -80,3 +80,4 @@ Note:
         Iris: bit 0~11;    F2.8->280->0x118 => 0x1, 0x18
         Seq:  bit 12~15;   mod(frame_seq). seq%16
 ```
+
