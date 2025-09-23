@@ -294,6 +294,7 @@ E2's Ethernet supports three IP modes:
 
     ```HTTP
     GET /ctrl/network?action=set&mode=Static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1
+    GET /ctrl/network?action=set&mode=Static&ipaddr=192.168.1.100&netmask=255.255.255.0&gateway=192.168.1.1&dns=8.8.8.8
     ```
 
 Get infomation about the currently-selected IP mode:
@@ -907,3 +908,4 @@ GET /ctrl/set?mwb_r=3000
 ```
 
 For B channel, please use mwb_b.
+
