@@ -1,0 +1,98 @@
+# Unreal Engine generated files
+Binaries/
+Intermediate/
+Saved/
+Build/
+DerivedDataCache/
+
+# Visual Studio files
+.vs/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+ipch/
+
+# Visual Studio Code files
+.vscode/
+*.code-workspace
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package files
+Package/
+
+# Unreal Engine specific
+*.uasset
+*.umap
+*.upk
+*.udk
+*.ubulk
+
+# Log files
+*.log
+
+# Backup files
+*.bak
+*~
+*.swp
+
+# IDE specific files
+*.VC.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/ 

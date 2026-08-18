@@ -5,6 +5,7 @@
 - data package is sent at project framerate
 - for Z-Cam PTZ product only. for example: [P2-R1](https://www.z-cam.com/p2-r1/)
 - [JS API](http/api.js)
+- [ZCAMFreeD Unreal Plugin](freed/UE/ZCAMFreeD) 
 
 ### Start Free-D streaming in one command:
 ```
