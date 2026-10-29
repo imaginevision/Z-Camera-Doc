@@ -1,14 +1,15 @@
 class HttpError extends Error {
-    constructor(status, message) {
+    constructor(status, message, data = null) {
         super(message);
         this.status = status;
         this.name = 'HttpError';
+        this.data = data;
     }
 }
 
 class Api {
     static async request(url, options = {}) {
-        const timeout = (options && options.timeout) || 20000;
+        const timeout = (options && options.timeout) || 5000;
         const fetchOptions = options ? { ...options } : {};
         if (fetchOptions.timeout) {
             delete fetchOptions.timeout;
@@ -23,6 +24,12 @@ class Api {
             });
 
             if (!response.ok) {
+                let errorData = null;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    // response body 不是 JSON 或为空
+                }
                 switch (response.status) {
                     case 401:
                         console.error(`Unauthorized ${url}`);
@@ -33,13 +40,17 @@ class Api {
                     case 404:
                         console.error(`Not Found ${url}`);
                         break;
+                    case 409:
+                        console.error(`Conflict ${url}`);
+                        break;
                     default:
                         console.error(`HTTP error! status: ${response.status} ${url}`);
                         break;
                 }
-                throw new HttpError(response.status, response.statusText);
+                throw new HttpError(response.status, response.statusText, errorData);
             }
-            return response.json(); 
+            const text = await response.text();
+            return text ? JSON.parse(text) : null;
         } catch (error) {
             console.error('Fetch error:', error);
             if (error.name === 'AbortError') {
@@ -61,6 +72,7 @@ class Api {
         setNickName: (name) => this.request(`/ctrl/nick_name?action=set&name=${encodeURIComponent(name)}`),
         commit: () => this.request("/commit_info"),
         gotoRec: () => this.request("/ctrl/mode?action=to_rec"),
+        gotoTimeLapse: () => this.request("/ctrl/mode?action=to_rec_tl"),
         getStatus: ()=> this.request("/camera_status")
     }
 
@@ -78,7 +90,7 @@ class Api {
     }
 
     static ctrl = {
-        set: (key, value)=> this.request(`/ctrl/set?${key}=${encodeURIComponent(value)}`),
+        set: (key, value, timeout = 5000)=> this.request(`/ctrl/set?${key}=${encodeURIComponent(value)}`, {timeout: timeout}),
         get: (key)=> this.request(`/ctrl/get?k=${key}`),
         getCatalog: (catalog)=> this.request(`/ctrl/getbatch?catalog=${catalog}`)
     }
@@ -90,6 +102,10 @@ class Api {
             out: (speed) => this.request(`/ctrl/lens?action=zoomout&fspeed=${speed}`),
             stop: () => this.request("/ctrl/lens?action=zoomstop"),
             status: () => this.request("/ctrl/lens?action=z_status"),
+
+            hfov: (zoomFactor) => zoomFactor != null && zoomFactor !== ''
+                ? this.request(`/ctrl/lens?action=hfov&zoom_factor=${zoomFactor}`)
+                : this.request("/ctrl/lens?action=hfov"),
 
             zoomMode: () => this.ctrl.get("zoom_mode"),
             setZoomMode: (mode) => this.ctrl.set("zoom_mode", mode)
@@ -158,6 +174,8 @@ class Api {
 
         directionMove: (direction, speed) => this.request(`/ctrl/pt?action=${direction}&fspeed=${speed}`),
         ptMove: (pan, tilt) => this.request(`/ctrl/pt?action=pt&pan_speed=${pan}&tilt_speed=${tilt}`),
+        ptGoto: (pan, tilt, speed, speedWithzoom = 1) => this.request(`/ctrl/pt?action=goto&pan_pos=${pan}&tilt_pos=${tilt}&pan_speed=${speed}&tilt_speed=${speed}&relative=0&speed_with_zoom=${speedWithzoom}`),
+        ptGotoRelative: (pan, tilt, speed, speedWithzoom = 1) => this.request(`/ctrl/pt?action=goto&pan_pos=${pan}&tilt_pos=${tilt}&pan_speed=${speed}&tilt_speed=${speed}&relative=1&speed_with_zoom=${speedWithzoom}`),
 
         home: () => this.request("/ctrl/pt?action=home"),
         reset: () => this.request("/ctrl/pt?action=reset"),
@@ -186,10 +204,11 @@ class Api {
         recall: (index) => this.request(`/ctrl/preset?action=recall&index=${index}`),
         save: (index) => this.request(`/ctrl/preset?action=set&index=${index}`),
         delete: (index) => this.request(`/ctrl/preset?action=del&index=${index}`),
+        deleteAll: () => this.request("/ctrl/preset?action=clear"),
 
         getInfo: (index) => this.request(`/ctrl/preset?action=get_info&index=${index}`),
         setName: (index, name) => this.request(`/ctrl/preset?action=set_name&index=${index}&new_name=${encodeURIComponent(name)}`),
-        
+
         setSpeedUnit: (index, unit) => this.request(`/ctrl/preset?action=preset_speed&index=${index}&preset_speed_unit=${unit}`),
         setSpeedByDuraton: (index, time) => this.request(`/ctrl/preset?action=preset_speed&index=${index}&preset_time=${time}`),
         setSpeedByIdex: (index, speed) => this.request(`/ctrl/preset?action=preset_speed&index=${index}&preset_speed=${speed}`),
@@ -215,6 +234,7 @@ class Api {
 
     static ptrace = {
         delete: (index) => this.request(`/ctrl/ptrace?action=del&index=${index}`),
+        deleteAll: () => this.request("/ctrl/ptrace?action=clear"),
         setName: (index, name) => this.request(`/ctrl/ptrace?action=set_name&index=${index}&new_name=${encodeURIComponent(name)}`),
 
         recordStart: (index) => this.request(`/ctrl/ptrace?action=rec_start&index=${index}`),
@@ -234,7 +254,7 @@ class Api {
         add: (name, password, permission) => this.request(`/login/adduser?user=${encodeURIComponent(name)}&pswd=${password}&grp=${permission}`),
         delete: (name) => this.request(`/login/deluser?user=${encodeURIComponent(name)}`),
         changePassword: (name, oldPassword, newPassword) => this.request(`/login/pswd?user=${encodeURIComponent(name)}&old=${oldPassword}&new=${newPassword}`),
-        logout: () => this.request("/login/quit")
+        logout: () => this.request("/login/quit"),
     }
 
     static ipManager = {
@@ -259,7 +279,9 @@ class Api {
         getStatus: () => this.request('/ctrl/rec?action=query'),
         getRemain: () => this.request('/ctrl/rec?action=remain'),
         getRepairStatus: () => this.request('/ctrl/rec?action=query_repairing'),
-        
+        repair: () => this.request('/ctrl/rec?action=repair'),
+        checkCorruptedFile: () => this.request('/ctrl/rec?action=query_corrupted'),
+
         tc: {
             query: () => this.request('/ctrl/tc?action=query'),
             reset: () => this.request('/ctrl/tc?action=reset'),
@@ -334,7 +356,9 @@ class Api {
             setMode: (mode) => this.ctrl.set("ezlink_mode", mode),
 
             trigger: () => this.ctrl.get("ezlink_trigger"),
-            setTrigger: (trigger) => this.ctrl.set("ezlink_trigger", trigger)
+            setTrigger: (trigger) => this.ctrl.set("ezlink_trigger", trigger),
+
+            clockMode: () => this.request('/ctrl/EzLink?action=get&key=clock_mode'),
         },
         genlock: {
             status: () => this.ctrl.get("genlock"),
@@ -420,8 +444,8 @@ class Api {
         https: () => this.ctrl.get("https_on"),
         setHttps: (enable) => this.ctrl.set("https_on", enable),
 
-        auth: () => this.ctrl.get("https_auth"),
-        setAuth: (enable) => this.ctrl.set("https_auth", enable),
+        auth: () => this.ctrl.get("http_auth"),
+        setAuth: (enable) => this.ctrl.set("http_auth", enable),
 
         certificate : {
             source: () => this.ctrl.get("https_cert_source"),
@@ -472,14 +496,15 @@ class Api {
             setAutoRestart: (autoRestart) => this.request(`/ctrl/srt?action=set&autoRestart=${autoRestart}`),
             setUrl: (url) => this.request(`/ctrl/srt?action=set&url=${encodeURIComponent(url)}`)
         },
-        
+
         // NDI控制
         ndi: {
             query: () => this.request('/ctrl/ndi?action=query'),
             set: (machine, stream, group, ttl,
                     multcast, multcast_net, multicast_prefix,
                     discover1, discover2,
-                    bridge_name, bridge_encry, bridge_server, bridge_port) => {
+                    bridge_name, bridge_encry, bridge_server,
+                    bridge_port, status, recommendedBitrate) => {
 
                 let params = "action=set";
                 if (machine && machine.length > 0) params += `&machine=${encodeURIComponent(machine)}`;
@@ -495,6 +520,8 @@ class Api {
                 params += `&bridgeEncryptionKey=${encodeURIComponent(bridge_encry)}`;
                 params += `&bridgeServer=${encodeURIComponent(bridge_server)}`;
                 if (bridge_port) params += `&bridgePort=${bridge_port}`;
+                if (status) params += `&status=${status}`;
+                if (recommendedBitrate) params += `&recommendedBitrate=${recommendedBitrate}`;
 
                 return this.request(`/ctrl/ndi?${params}`);
             }
@@ -502,21 +529,19 @@ class Api {
 
         rtsp : {
             query: () => this.request('/ctrl/rtsp?action=query'),
-            setAuth: (auth) => this.request(`/ctrl/rtsp?action=set&authentication=${auth}`)
+            setAuth: (auth) => this.request(`/ctrl/rtsp?action=set&authentication=${auth}`),
+            setPcmAlaw: (pcmAlaw) => this.request(`/ctrl/rtsp?action=set&pcmAlaw=${pcmAlaw}`)
         },
 
-        query: (index) => this.request(`/ctrl/stream_setting?action=query&index=stream${index}`),
-        setBitrate: (index, bitrate) => this.request(`/ctrl/stream_setting?index=stream${index}&bitrate=${bitrate}`),
-        performance: (index) => this.request(`/ctrl/stream_setting?action=stream_performance&index=stream${index}`),
-
-        resolution: () => this.ctrl.get("stream_resolution"),
-        setResolution: (resolution) => this.ctrl.set("stream_resolution", resolution),
-
-        fps: () => this.ctrl.get("stream_fps"),
-        setFps: (fps) => this.ctrl.set("stream_fps", fps),
-
-        encoder: () => this.ctrl.get("stream_video_encoder"),
-        setEncoder: (encoder) => this.ctrl.set("stream_video_encoder", encoder),
+        queryAll: () => this.request(`/ctrl/stream_setting?action=query`),
+        query: (index) => this.request(`/ctrl/stream_setting?action=query&index=${index}`),
+        setBitrate: (index, bitrate) => this.request(`/ctrl/stream_setting?index=${index}&bitrate=${bitrate}`),
+        setWidthHeightBitrate: (index, width, height, bitrate) => this.request(`/ctrl/stream_setting?index=${index}&width=${width}&height=${height}&bitrate=${bitrate}`),
+        setGop: (index, gop) => this.request(`/ctrl/stream_setting?index=${index}&gop_n=${gop}`),
+        performance: (index) => this.request(`/ctrl/stream_setting?action=stream_performance&index=${index}`),
+        setWidthHeight: (index, width, height) => this.request(`/ctrl/stream_setting?index=${index}&width=${width}&height=${height}`),
+        setFps: (index, fps) => this.request(`/ctrl/stream_setting?index=${index}&fps=${fps}`),
+        setEncoder: (index, encoder, bitwidth = 8) => this.request(`/ctrl/stream_setting?index=${index}&venc=${encoder}&bitwidth=${bitwidth}`),
 
         streamParamSave: () => this.ctrl.get("stream_param_save"),
         setStreamParamSave: (enable) => this.ctrl.set("stream_param_save", enable)
@@ -638,7 +663,15 @@ class Api {
         lockAeInRec: () => this.ctrl.get("lock_ae_in_rec"),
 
         setBacklightComp: (enable) => this.ctrl.set("bl_comp", enable),
-        backlightComp: () => this.ctrl.get("bl_comp")
+        backlightComp: () => this.ctrl.get("bl_comp"),
+
+        setMeteringWin: (enable) => this.ctrl.set("exposure_window_idx", enable),
+        meteringWin: () => this.ctrl.get("exposure_window_idx"),
+
+        meteringWindow: {
+            query: () => this.request("/ctrl/exposure/window?action=query"),
+            set: (left, top, right, bottom) => this.request("/ctrl/exposure/window?action=set&left=" + left + "&top=" + top + "&right=" + right + "&bottom=" + bottom),
+        }
     }
 
     static whiteBalance = {
@@ -780,21 +813,33 @@ class Api {
 
         setStartPos: (index) => this.request(`/ctrl/framing/start_position?index=${index}`),
 
-        setFovType: (type) => this.request(`/ctrl/framing/fov?type=${type}`),
-        setFovBodySize: (size) => this.request(`/ctrl/framing/fov?body_size=${size}`),
+        setFovSize: (size, preset = 0) => this.request(`/ctrl/framing/fov?fov_size=${size}&preset=${preset}`),
         setFovFaceHeight: (height) => this.request(`/ctrl/framing/fov?face_height=${height}`),
         setFovPlacement: (placement) => this.request(`/ctrl/framing/fov?placement=${placement}`),
         debugFov: () => this.request('/ctrl/framing/debug_fov'),
+
+        fovPresetQuery: () => this.request('/ctrl/framing/preset'),
+        fovPresetUpdate: (index, name) => this.request(`/ctrl/framing/preset?action=update&index=${index}&name=${encodeURIComponent(name)}`),
+        fovPresetRecall: (index) => this.request(`/ctrl/framing/preset?action=recall&index=${index}`),
+        fovPresetRename: (index, name) => this.request(`/ctrl/framing/preset?action=rename&index=${index}&name=${encodeURIComponent(name)}`),
+        fovPresetReset: (index) => this.request(`/ctrl/framing/preset?action=reset&index=${index}`),
+        fovPresetAdd: (name) => {
+            if (name !== undefined) {
+                return this.request(`/ctrl/framing/preset?action=add&name=${encodeURIComponent(name)}`);
+            }
+            return this.request(`/ctrl/framing/preset?action=add`);
+        },
+        fovPresetDel: (index) => this.request(`/ctrl/framing/preset?action=del&index=${index}`),
 
         setAutoStart: (enable) => this.request(`/ctrl/framing/auto_start?enable=${enable}`),
         restart: () => this.request('/ctrl/framing/restart'),
 
         setAutoTarget: (enable) => this.request(`/ctrl/framing/auto_target?enable=${enable}`),
-    
+
         setTargetLostAction: (action) => this.request(`/ctrl/framing/target_lost?action=${action}`),
         setTargetLostTimeout: (timeout) => this.request(`/ctrl/framing/target_lost?timeout_sec=${timeout}`),
         getTargetLostTimeout: () => this.request('/ctrl/framing/target_lost?action=query'),
-    
+
         setDetectRestartTime: (time) => this.request(`/ctrl/framing/detect_restart?time=${time}`),
         getDetectRestartTime: () => this.request('/ctrl/framing/detect_restart?action=query'),
 
@@ -804,7 +849,8 @@ class Api {
         status: () => this.request('/ctrl/framing/status'),
         allStatus: () => this.request('/ctrl/framing/all_status'),
         info: () => this.request('/ctrl/framing/info'),
-        
+        config: () => this.request('/ctrl/framing/config'),
+
         tally: (enable) => this.request(`/ctrl/framing/tally?enable=${enable}`),
 
         maskEnable: (enable) => this.request(`/ctrl/framing/mask_area?enable=${enable}`),
@@ -819,6 +865,52 @@ class Api {
 
         setLockTilt: (enable) => this.request(`/ctrl/framing/tilt_lock?enable=${enable}`),
         getLockTilt: () => this.request(`/ctrl/framing/tilt_lock`),
+
+        setLockZoom: (enable) => this.request(`/ctrl/framing/zoom_lock?enable=${enable}`),
+        getLockZoom: () => this.request(`/ctrl/framing/zoom_lock`),
+
+        gesture: () => this.request('/ctrl/framing/gesture'),
+        setWaving: (enable) => this.request(`/ctrl/framing/gesture?waving=${enable}`),
+        setFullBody: (enable) => this.request(`/ctrl/framing/gesture?fullbody=${enable}`),
+        setWaist: (enable) => this.request(`/ctrl/framing/gesture?waist=${enable}`),
+        setCloseup: (enable) => this.request(`/ctrl/framing/gesture?closeup=${enable}`),
+        setThree: (enable) => this.request(`/ctrl/framing/gesture?three=${enable}`),
+        setFour: (enable) => this.request(`/ctrl/framing/gesture?four=${enable}`),
+        setFive: (enable) => this.request(`/ctrl/framing/gesture?five=${enable}`),
+
+        // ROI selection for CV tracking
+        selectRoi: (x, y, w, h) => this.request(`/ctrl/framing/select_roi?x=${x}&y=${y}&w=${w}&h=${h}`),
+        getRoi: () => this.request('/ctrl/framing/select_roi'),
+
+        setScene: (scene) => this.request(`/ctrl/framing/scene?scene=${scene}`),
+        getScene: () => this.request('/ctrl/framing/scene'),
+
+        setTrackingRecordEnable: (enable) => this.request(`/ctrl/framing/tracking_record?enable=${enable}`),
+        getTrackingRecordEnable: () => this.request(`/ctrl/framing/tracking_record`),
+
+        getTrackingBox: () => this.request('/ctrl/framing/tracking_box'),
+        enableTrackingBox: (enable) => this.request(`/ctrl/framing/tracking_box?enable=${enable}`),
+        setTrackingBox: (pan, tilt, zoomFactor, roi) =>
+            this.request(
+                `/ctrl/framing/tracking_box?action=update&pan=${pan}&tilt=${tilt}&zoom_factor=${zoomFactor}`
+                + (roi ? `&top=${roi.top}&left=${roi.left}&width=${roi.width}&height=${roi.height}` : '')
+            ),
+        setTrackingBoxRoi: (roi) =>
+            this.request(
+                `/ctrl/framing/tracking_box?action=update&top=${roi.top}&left=${roi.left}&width=${roi.width}&height=${roi.height}`
+            ),
+        getFixAngleBox: () => this.request('/ctrl/framing/fix_angle_box'),
+        enableFixAngleBox: (enable) => this.request(`/ctrl/framing/fix_angle_box?enable=${enable}`),
+        setFixAngleBox: (pan, tilt, zoomFactor) =>
+            this.request(
+                `/ctrl/framing/fix_angle_box?action=update&pan=${pan}&tilt=${tilt}&zoom_factor=${zoomFactor}`
+            ),
+
+        getSpeed: () => this.request('/ctrl/framing/speed'),
+        setSpeedSensitivity: (sensitivity) => this.request(`/ctrl/framing/speed?sensitivity=${sensitivity}`),
+        setSpeedAcceleration: (acceleration) => this.request(`/ctrl/framing/speed?acceleration=${acceleration}`),
+
+        exportFramingProfile: () => this.request('/ctrl/framing/export'),
     }
 
     static ezframing = {
@@ -827,13 +919,14 @@ class Api {
     }
 
     static facedb = {
-        query: () => this.request('/ctrl/facedb/query'),
-        prepare: (uid) => this.request(`/ctrl/facedb/prepare?face_id=${uid}`),
-        add: (uid, name, priority, activate) => this.request(`/ctrl/facedb/add?which=${uid}&name=${name}&priority=${priority}&activate=${activate}`),
-        update: (uid, name, priority, activate) => this.request(`/ctrl/facedb/update?uid=${uid}&name=${name}&priority=${priority}&activate=${activate}`),
-        delete: (uid) => this.request(`/ctrl/facedb/delete?uid=${uid}`),
-        enable: (enable) => this.request(`/ctrl/facedb/set?enable=${enable}`),
-        status: () => this.request('/ctrl/facedb/status')
+        query: () => this.request('/facedb/query'),
+        prepare: (uid) => this.request(`/facedb/prepare?face_id=${uid}`),
+        prepareFromFile: (uid) => this.request(`/facedb/prepare_from_file?face_id=${uid}`),
+        add: (uid, name, priority, activate) => this.request(`/facedb/add?which=${uid}&name=${name}&priority=${priority}&activate=${activate}`),
+        update: (uid, name, priority, activate) => this.request(`/facedb/update?uid=${uid}&name=${name}&priority=${priority}&activate=${activate}`),
+        delete: (uid) => this.request(`/facedb/delete?uid=${uid}`),
+        enable: (enable) => this.request(`/facedb/set?enable=${enable}`),
+        status: () => this.request('/facedb/status')
     }
 
     static upgrade = {
@@ -843,7 +936,7 @@ class Api {
     }
 
     static files = {
-        listFolders: () => this.request("/DCIM/"),
+        listFolders: (thumb = 0) => this.request(`/DCIM/?thumb=${thumb}`),
         listFiles: (folder) => this.request(`/DCIM/${folder}/`),
         deleteFile: (fileName) => this.request(`/DCIM/${fileName}?act=rm`)
     }
@@ -904,7 +997,8 @@ class Api {
         card: {
             isPresent: () => this.request('/ctrl/card?action=present'),
             queryFormat: () => this.request('/ctrl/card?action=query_format'),
-            format: () => this.request('/ctrl/card?action=format')
+            format: () => this.request('/ctrl/card?action=format'),
+            query: () => this.request('/ctrl/card?action=query')
         },
 
         power: {
@@ -918,6 +1012,13 @@ class Api {
 
             autoStandby: () => this.ctrl.get("auto_standby"),
             setAutoStandby: (time) => this.ctrl.set("auto_standby", time),
+        },
+
+        ptp: {
+            query: () => this.request("/ctrl/ptp?action=query"),
+            setPtpDomainMode: (domain, mode) => this.request("/ctrl/ptp?action=set&domain=" + domain + "&mode=" + mode),
+            setMode: (mode) => this.request("/ctrl/ptp?action=set&mode=" + mode),
+            setDomain: (domain) => this.request("/ctrl/ptp?action=set&domain=" + domain),
         }
     }
 
@@ -967,8 +1068,8 @@ class Api {
                 if (ip) params.append('ipaddr', ip);
                 if (netmask) params.append('netmask', netmask);
                 if (gateway) params.append('gateway', gateway);
-                if (dns) params.append('dns', dns);
-                return this.request(`/ctrl/network?${params.toString()}`);
+                if (dns !== null && dns !== undefined) params.append('dns', dns);
+                return this.request(`/ctrl/network?${params.toString()}`, {timeout: 10000});
             }
         },
 
@@ -981,5 +1082,22 @@ class Api {
             setWifiChannel: (enable) => this.ctrl.set("wifi_channel", enable),
             wifiChannel: () => this.ctrl.get("wifi_channel"),
         }
+    }
+
+    static ezplay = {
+        startRec: () => this.request('/ctrl/ezplay?action=start_rec'),
+        stopRec: () => this.request('/ctrl/ezplay?action=stop_rec'),
+        setServerIp: (ip) => this.request(`/ctrl/ezplay?action=client_set&sspServerIp=${ip}`),
+        setStreamStyle: (streamStyle) => this.request(`/ctrl/ezplay?action=client_set&streamStyle=${streamStyle}`),
+        setServerParam: (ip, streamStyle) => {
+            const params = new URLSearchParams();
+            params.append('action', 'client_set');
+            if (ip) params.append('sspServerIp', ip);
+            if (streamStyle) params.append('streamStyle', streamStyle);
+            return this.request(`/ctrl/ezplay?${params.toString()}`);
+        },
+        queryServerParam: () => this.request('/ctrl/ezplay?action=client_query'),
+        toPb: () => this.request('/ctrl/ezplay?action=to_pb'),
+        exitPb: () => this.request('/ctrl/ezplay?action=exit_pb'),
     }
 }
