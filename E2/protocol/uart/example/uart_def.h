@@ -1,6 +1,17 @@
 #ifndef __UART_DEF__
 #define __UART_DEF__
 
+
+#define BigLittleSwap16(A)        ((((unsigned short)(A) & 0xff00) >> 8) | \
+                                   (((unsigned short)(A) & 0x00ff) << 8))
+
+#define BigLittleSwap32(A)        ((((unsigned int)(A) & 0xff000000) >> 24) | \
+                                   (((unsigned int)(A) & 0x00ff0000) >> 8) | \
+                                   (((unsigned int)(A) & 0x0000ff00) << 8) | \
+                                   (((unsigned int)(A) & 0x000000ff) << 24))
+
+
+
 #define UART_MCU_TO_CAM            0x01   //cam is slave, uart data from MCU to cam.
 #define UART_ACK_FROM_CAM2MCU      0x81   //ack from cam.
 
@@ -18,33 +29,63 @@ enum {
 };
 
 enum {
-    RC_CODE_F1,
+    RC_CODE_F1,             //0
     RC_CODE_RETURN,
     RC_CODE_UP,
     RC_CODE_DOWN,
     RC_CODE_ESC,
-    RC_CODE_F1_RELEASE,
+    RC_CODE_F1_RELEASE,     //5
     RC_CODE_RETURN_RELEASE,
     RC_CODE_UP_RELEASE,
     RC_CODE_DOWN_RELEASE,
     RC_CODE_ESC_RELEASE,
+    RC_CODE_POWER,          //10
+    RC_CODE_POWER_RELEASE,
+    RC_CODER_ROI_AREA,
+    RC_CODER_UP_VALUE_KEY,
+    RC_CODER_DOWN_VALUE_KEY,
+    RC_CODE_F2,             //15
+    RC_CODE_F2_RELEASE,
+    RC_CODE_F3,
+    RC_CODE_F3_RELEASE,
+    RC_CODE_F4,
+    RC_CODE_F4_RELEASE,     //20
+    RC_CODE_MENU,
+    RC_CODE_MENU_RELEASE,
+    RC_CODE_SPACE,
+    RC_CODE_SPACE_RELEASE,
+    RC_CODE_LEFT,           //25
+    RC_CODE_LEFT_RELEASE,
+    RC_CODE_RIGHT,
+    RC_CODE_RIGHT_RELEASE,
+
+    RC_CODE_INPUTBUTTON1_PRESSED = 0x30,
+    RC_CODE_INPUTBUTTON2_PRESSED = 0x31,
+    RC_CODE_FRONT_WHELL_KEY_PRESSED = 0x39,
+    RC_CODE_SIDE_WHELL_KEY_PRESSED = 0x3B,
+    RC_CODE_FRONT_WHELL_SCOLL_DOWN = 0x3F,
+    RC_CODE_FRONT_WHELL_SCOLL_UP   = 0x41,
+    RC_CODE_SIDE_WHELL_SCOLL_UP   = 0x50,
+    RC_CODE_SIDE_WHELL_SCOLL_DOWN = 0x58,
 
     RC_CODE_A_PRESSED = 0x64,
     RC_CODE_A_RELEASED,
     RC_CODE_B_PRESSED,
     RC_CODE_B_RELEASED,
     RC_CODE_C_PRESSED,
-    RC_CODE_C_RELEASED,
+    RC_CODE_C_RELEASED,     //105
     RC_CODE_D_PRESSED,
     RC_CODE_D_RELEASED,
     RC_CODE_A_FN_PRESSED,
     RC_CODE_A_FN_RELEASED,
-    RC_CODE_B_FN_PRESSED,
+    RC_CODE_B_FN_PRESSED,   //110
     RC_CODE_B_FN_RELEASED,
     RC_CODE_C_FN_PRESSED,
     RC_CODE_C_FN_RELEASED,
     RC_CODE_D_FN_PRESSED,
-    RC_CODE_D_FN_RELEASED,
+    RC_CODE_D_FN_RELEASED,      //115
+    RC_CODE_SPECIAL_REC_START_RELEASED,
+    RC_CODE_SPECIAL_REC_STOP_RELEASED,
 };
 
 // uart remote to camera
@@ -124,6 +165,41 @@ enum {
     UART_CONFIG_DOWN_VALUE,
     UART_SET_CONFIG_EXT,         //45
     UART_GET_CONFIG_EXT,
+    UART_GET_BATTERY_VOLT,      // | cmd |
+                            // | ack | ok/ng | 4byte(volt * 10)|
+    UART_GET_CARD_INFO,     // | cmd |
+                            // | ack | ok/ng | 8byte(total size )| 8byte(free size )|
+    UART_GET_MULTIPLE_CONTROL_ROLE, // | cmd |
+                            // | ack | ok/ng | multiple control role |
+    UART_GET_REC_FILENAME,  //50    | cmd |
+                            // | ack | ok/ng | string |
+    UART_GET_TEMPERATURE,   // | cmd |
+                            // | ack | ok/ng | 4byte(temperature)|
+    UART_SET_DATETIME,      // | cmd | 4byte*7(datetime)|
+                            // | ack | ok/ng |
+    UART_GET_DATETIME,      // | cmd |
+                            // | ack | ok/ng | 4byte*7(datetime)|
+    UART_GET_CARD_IS_READONLY,   // | cmd |
+                            // | ack | ok/ng | 1byte|
+    UART_GET_REELNAME_NUM,  //55 | cmd |
+                            // | ack | ok/ng | 4byte|
+    UART_GET_DCF_MAX_NUM,   // | cmd |
+                            // | ack | ok/ng | 4byte|
+    UART_SET_LANGUAGE,   // | cmd |
+                            // | ack | ok/ng
+    UART_GET_LANGUAGE,      // | cmd |
+                            // | ack | ok/ng | 0/1,  en/cn |
+    UART_GET_IPADDR,        // | cmd | 0/1, eth0/wlan0 |
+                            // | ack | ok/ng | string |
+    UART_GET_PREFERENCE,    // 60 | cmd | 0/1, int/string type| default value | key |
+                            // | ack | ok/ng | 0 | int |
+                            // | ack | ok/ng | 1 | string |
+    UART_SET_AF_AREA,       // | cmd | 4byte * 4(area) |
+                            // | ack | ok/ng |
+    UART_GET_AF_AREA,       // | cmd |
+                            // | ack | ok/ng | 4byte * 4(area) |
+    UART_GET_DISPLAY_REAL_AREA,   // | cmd |
+                            // | ack | ok/ng | 4byte(voDevice)+4byte * 4(area) |
 };
 
 enum uart_camera_status {
@@ -141,10 +217,16 @@ enum uart_camera_status {
 typedef enum {
     UART_MULTI_ROLE_UART,
     UART_MULTI_ROLE_PTZ,
-    UART_MULTI_ROLE_MUX
+    UART_MULTI_ROLE_MUX,
+    UART_MULTI_ROLE_LTC,
+    UART_MULTI_ROLE_CONTROLLER,
+    UART_MULTI_ROLE_TCP,
 } UART_MULTI_ROLE;
 
-
+enum {
+    UART_GET_ETH_IP,
+    UART_GET_WLAN_IP
+};
 
 enum {
     CAMERA_CONFIG_TYPE_CHOICE   = 0x1,
